@@ -1,0 +1,724 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Risk Center">
+  <main class="risk-page">
+
+    <header class="page-header">
+      <div>
+        <div class="eyebrow">LEX8R TRADING OS</div>
+        <h1>Risk Center</h1>
+        <p>Account protection, exposure and drawdown monitoring.</p>
+      </div>
+
+      <div class="risk-status safe" id="overallStatus">
+        SAFE
+      </div>
+    </header>
+
+    <section class="account-selector">
+      <label for="accountSelect">ACCOUNT</label>
+
+      <select id="accountSelect">
+        <option value="maven-2k">Maven $2K</option>
+        <option value="personal-1k">Personal $1K</option>
+        <option value="evaluation-5k">Evaluation $5K</option>
+      </select>
+    </section>
+
+    <section class="risk-grid">
+
+      <article class="risk-card primary">
+        <div class="card-label">CURRENT EQUITY</div>
+        <div class="card-value" id="equity">$0.00</div>
+        <div class="card-sub" id="equityChange">+$0.00</div>
+      </article>
+
+      <article class="risk-card">
+        <div class="card-label">RISK / TRADE</div>
+        <div class="card-value" id="riskPercent">1.00%</div>
+        <div class="card-sub" id="riskAmount">$0.00</div>
+      </article>
+
+      <article class="risk-card">
+        <div class="card-label">DAILY LOSS REMAINING</div>
+        <div class="card-value" id="dailyRemaining">$0.00</div>
+        <div class="progress">
+          <div id="dailyProgress"></div>
+        </div>
+      </article>
+
+      <article class="risk-card">
+        <div class="card-label">MAX DRAWDOWN REMAINING</div>
+        <div class="card-value" id="drawdownRemaining">$0.00</div>
+        <div class="progress">
+          <div id="drawdownProgress"></div>
+        </div>
+      </article>
+
+    </section>
+
+    <section class="risk-layout">
+
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="eyebrow">ACCOUNT PROTECTION</div>
+            <h2>Risk Limits</h2>
+          </div>
+        </div>
+
+        <div class="limit-list">
+
+          <div class="limit-row">
+            <div>
+              <span>Daily Loss Limit</span>
+              <small id="dailyLimitLabel">$0 / $0</small>
+            </div>
+
+            <strong id="dailyLimitValue">0%</strong>
+          </div>
+
+          <div class="progress">
+            <div id="dailyLimitBar"></div>
+          </div>
+
+          <div class="limit-row">
+            <div>
+              <span>Maximum Drawdown</span>
+              <small id="maxDrawdownLabel">$0 / $0</small>
+            </div>
+
+            <strong id="maxDrawdownValue">0%</strong>
+          </div>
+
+          <div class="progress">
+            <div id="maxDrawdownBar"></div>
+          </div>
+
+          <div class="limit-row">
+            <div>
+              <span>Profit Target</span>
+              <small id="targetLabel">$0 / $0</small>
+            </div>
+
+            <strong id="targetValue">0%</strong>
+          </div>
+
+          <div class="progress gold">
+            <div id="targetBar"></div>
+          </div>
+
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="eyebrow">TRADE CONTROL</div>
+            <h2>Position Risk</h2>
+          </div>
+        </div>
+
+        <div class="control-list">
+
+          <div class="control-row">
+            <span>Account Risk</span>
+            <strong id="controlRisk">1.00%</strong>
+          </div>
+
+          <div class="control-row">
+            <span>Risk Amount</span>
+            <strong id="controlAmount">$0.00</strong>
+          </div>
+
+          <div class="control-row">
+            <span>1R Loss</span>
+            <strong id="oneR">$0.00</strong>
+          </div>
+
+          <div class="control-row">
+            <span>2R Loss</span>
+            <strong id="twoR">$0.00</strong>
+          </div>
+
+          <div class="control-row">
+            <span>3R Loss</span>
+            <strong id="threeR">$0.00</strong>
+          </div>
+
+        </div>
+      </article>
+
+    </section>
+
+    <section class="panel account-overview">
+      <div class="panel-header">
+        <div>
+          <div class="eyebrow">PORTFOLIO</div>
+          <h2>Account Risk Overview</h2>
+        </div>
+      </div>
+
+      <div class="overview-grid" id="accountOverview"></div>
+    </section>
+
+    <script>
+  import {
+    accounts,
+    resolveAccountId
+  } from "../lib/accounts";
+
+  import {
+    loadTrades
+  } from "../lib/tradeStore";
+
+  import {
+    calculateAnalytics
+  } from "../lib/analyticsEngine";
+
+  import {
+    calculateRiskAmount
+  } from "../lib/accountEngine";
+
+  const accountSelect =
+    document.querySelector("#accountSelect");
+
+  const money = (value) =>
+    `${value < 0 ? "-" : ""}$${Math.abs(value).toFixed(2)}`;
+
+  const signedMoney = (value) =>
+    `${value >= 0 ? "+" : "-"}$${Math.abs(value).toFixed(2)}`;
+
+  function updateRisk() {
+    const accountId =
+      accountSelect?.value || accounts[0].id;
+
+    const account =
+      accounts.find(
+        (item) => item.id === accountId
+      );
+
+    if (!account) return;
+
+    const trades = loadTrades();
+
+    const accountTrades =
+      trades.filter(
+        (trade) =>
+          resolveAccountId(trade.accountId) === account.id
+      );
+
+    const analytics =
+      calculateAnalytics(accountTrades);
+
+    const equity =
+      account.startingBalance +
+      analytics.totalPnL;
+
+    const riskAmount =
+      calculateRiskAmount(
+        account.id,
+        account.riskPerTrade
+      );
+
+    const dailyLoss =
+      Math.max(
+        -account.dailyLossLimit -
+          Math.min(analytics.totalPnL, 0),
+        0
+      );
+
+    const drawdown =
+      Math.max(
+        -analytics.totalPnL,
+        0
+      );
+
+    const dailyUsed =
+      Math.min(
+        Math.max(-analytics.totalPnL, 0),
+        account.dailyLossLimit
+      );
+
+    const drawdownUsed =
+      Math.min(
+        drawdown,
+        account.maxDrawdown
+      );
+
+    const dailyPercent =
+      account.dailyLossLimit > 0
+        ? (dailyUsed / account.dailyLossLimit) * 100
+        : 0;
+
+    const drawdownPercent =
+      account.maxDrawdown > 0
+        ? (drawdownUsed / account.maxDrawdown) * 100
+        : 0;
+
+    const targetPercent =
+      account.profitTarget > 0
+        ? Math.min(
+            Math.max(
+              (analytics.totalPnL /
+                account.profitTarget) *
+                100,
+              0
+            ),
+            100
+          )
+        : 0;
+
+    document.querySelector("#equity").textContent =
+      money(equity);
+
+    document.querySelector("#equityChange").textContent =
+      signedMoney(analytics.totalPnL);
+
+    document.querySelector("#riskPercent").textContent =
+      `${account.riskPerTrade.toFixed(2)}%`;
+
+    document.querySelector("#riskAmount").textContent =
+      money(riskAmount);
+
+    document.querySelector("#dailyRemaining").textContent =
+      money(
+        Math.max(
+          account.dailyLossLimit - dailyUsed,
+          0
+        )
+      );
+
+    document.querySelector("#drawdownRemaining").textContent =
+      money(
+        Math.max(
+          account.maxDrawdown - drawdownUsed,
+          0
+        )
+      );
+
+    document.querySelector("#dailyProgress").style.width =
+      `${dailyPercent}%`;
+
+    document.querySelector("#drawdownProgress").style.width =
+      `${drawdownPercent}%`;
+
+    document.querySelector("#dailyLimitLabel").textContent =
+      `${money(dailyUsed)} / ${money(account.dailyLossLimit)}`;
+
+    document.querySelector("#dailyLimitValue").textContent =
+      `${dailyPercent.toFixed(1)}%`;
+
+    document.querySelector("#dailyLimitBar").style.width =
+      `${dailyPercent}%`;
+
+    document.querySelector("#maxDrawdownLabel").textContent =
+      `${money(drawdownUsed)} / ${money(account.maxDrawdown)}`;
+
+    document.querySelector("#maxDrawdownValue").textContent =
+      `${drawdownPercent.toFixed(1)}%`;
+
+    document.querySelector("#maxDrawdownBar").style.width =
+      `${drawdownPercent}%`;
+
+    document.querySelector("#targetLabel").textContent =
+      `${money(Math.max(analytics.totalPnL, 0))} / ${money(account.profitTarget)}`;
+
+    document.querySelector("#targetValue").textContent =
+      account.profitTarget > 0
+        ? `${targetPercent.toFixed(1)}%`
+        : "N/A";
+
+    document.querySelector("#targetBar").style.width =
+      `${targetPercent}%`;
+
+    document.querySelector("#controlRisk").textContent =
+      `${account.riskPerTrade.toFixed(2)}%`;
+
+    document.querySelector("#controlAmount").textContent =
+      money(riskAmount);
+
+    document.querySelector("#oneR").textContent =
+      money(riskAmount);
+
+    document.querySelector("#twoR").textContent =
+      money(riskAmount * 2);
+
+    document.querySelector("#threeR").textContent =
+      money(riskAmount * 3);
+
+    const status =
+      document.querySelector("#overallStatus");
+
+    const highestUsage =
+      Math.max(
+        dailyPercent,
+        drawdownPercent
+      );
+
+    status.className = "risk-status";
+
+    if (highestUsage >= 80) {
+      status.textContent = "DANGER";
+      status.classList.add("danger");
+    } else if (highestUsage >= 60) {
+      status.textContent = "WARNING";
+      status.classList.add("warning");
+    } else {
+      status.textContent = "SAFE";
+      status.classList.add("safe");
+    }
+
+    const overview =
+      document.querySelector("#accountOverview");
+
+    overview.innerHTML = "";
+
+    accounts.forEach((item) => {
+      const itemTrades =
+        trades.filter(
+          (trade) =>
+            resolveAccountId(trade.accountId) === item.id
+        );
+
+      const itemAnalytics =
+        calculateAnalytics(itemTrades);
+
+      const itemEquity =
+        item.startingBalance +
+        itemAnalytics.totalPnL;
+
+      const itemRisk =
+        calculateRiskAmount(
+          item.id,
+          item.riskPerTrade
+        );
+
+      const card =
+        document.createElement("div");
+
+      card.className = "overview-card";
+
+      card.innerHTML = `
+        <div class="overview-name">
+          ${item.name}
+        </div>
+
+        <div class="overview-meta">
+          ${item.type} • ${item.status}
+        </div>
+
+        <div class="overview-value">
+          ${money(itemEquity)}
+        </div>
+
+        <div class="overview-risk">
+          ${item.riskPerTrade.toFixed(2)}% RISK •
+          ${money(itemRisk)} / TRADE
+        </div>
+      `;
+
+      overview.appendChild(card);
+    });
+  }
+
+  accountSelect?.addEventListener(
+    "change",
+    updateRisk
+  );
+
+  updateRisk();
+
+  window.addEventListener(
+    "storage",
+    updateRisk
+  );
+</script>
+
+  </main>
+</Layout>
+
+<style>
+  :global(*) {
+    box-sizing: border-box;
+  }
+
+  :global(body) {
+    margin: 0;
+    background: #050506;
+    color: #d6d6da;
+    font-family: Inter, Arial, sans-serif;
+  }
+
+  .risk-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 42px;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
+
+  .eyebrow,
+  .card-label {
+    color: #66666e;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+  }
+
+  h1 {
+    margin: 8px 0;
+    color: #f0f0f2;
+    font-size: 30px;
+    letter-spacing: -1px;
+  }
+
+  h2 {
+    margin: 6px 0 0;
+    color: #e4e4e7;
+    font-size: 16px;
+  }
+
+  p {
+    margin: 0;
+    color: #66666e;
+    font-size: 11px;
+  }
+
+  .risk-status {
+    padding: 7px 12px;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+  }
+
+  .safe {
+    color: #38d996;
+    background: rgba(56,217,150,.08);
+    border: 1px solid rgba(56,217,150,.15);
+  }
+
+  .warning {
+    color: #d4af37;
+    background: rgba(212,175,55,.08);
+    border: 1px solid rgba(212,175,55,.15);
+  }
+
+  .danger {
+    color: #ff5c5c;
+    background: rgba(255,92,92,.08);
+    border: 1px solid rgba(255,92,92,.15);
+  }
+
+  .account-selector {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .account-selector label {
+    color: #66666e;
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+
+  select {
+    background: #0b0b0e;
+    border: 1px solid #19191e;
+    color: #d6d6da;
+    padding: 9px 12px;
+    outline: none;
+  }
+
+  .risk-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .risk-card,
+  .panel {
+    background: #09090c;
+    border: 1px solid #151519;
+  }
+
+  .risk-card {
+    padding: 20px;
+    min-height: 125px;
+  }
+
+  .card-value {
+    margin-top: 16px;
+    color: #f0f0f2;
+    font-size: 25px;
+    font-weight: 600;
+  }
+
+  .card-sub {
+    margin-top: 7px;
+    color: #38d996;
+    font-size: 10px;
+  }
+
+  .risk-layout {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .panel {
+    padding: 22px;
+  }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+  }
+
+  .limit-list {
+    display: grid;
+    gap: 20px;
+  }
+
+  .limit-row,
+  .control-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .limit-row span,
+  .control-row span {
+    display: block;
+    color: #9999a1;
+    font-size: 11px;
+  }
+
+  .limit-row small {
+    display: block;
+    margin-top: 5px;
+    color: #55555d;
+    font-size: 9px;
+  }
+
+  .limit-row strong,
+  .control-row strong {
+    color: #d6d6da;
+    font-size: 11px;
+  }
+
+  .progress {
+    height: 4px;
+    margin-top: -12px;
+    background: #19191e;
+    overflow: hidden;
+  }
+
+  .progress div {
+    height: 100%;
+    width: 0;
+    background: #38d996;
+    transition: width .25s ease;
+  }
+
+  .progress.gold div {
+    background: #d4af37;
+  }
+
+  .control-list {
+    display: grid;
+    gap: 0;
+  }
+
+  .control-row {
+    padding: 15px 0;
+    border-bottom: 1px solid #151519;
+  }
+
+  .control-row:last-child {
+    border-bottom: 0;
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .overview-card {
+    padding: 16px;
+    background: #0b0b0e;
+    border: 1px solid #151519;
+  }
+
+  .overview-name {
+    color: #d6d6da;
+    font-size: 11px;
+  }
+
+  .overview-meta {
+    margin-top: 6px;
+    color: #55555d;
+    font-size: 9px;
+  }
+
+  .overview-value {
+    margin-top: 14px;
+    color: #f0f0f2;
+    font-size: 18px;
+  }
+
+  .overview-risk {
+    margin-top: 6px;
+    color: #38d996;
+    font-size: 9px;
+  }
+
+  @media (max-width: 900px) {
+    .risk-page {
+      padding: 22px;
+    }
+
+    .risk-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .risk-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .overview-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .risk-page {
+      padding: 16px;
+    }
+
+    .page-header {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .risk-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .account-selector {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>

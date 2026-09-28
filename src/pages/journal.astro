@@ -1,0 +1,707 @@
+---
+import Layout from "../layouts/Layout.astro";
+import {
+  trades,
+  getNetR,
+  getWinRate,
+  getProfitFactor
+} from "../lib/trades";
+
+const stats = [
+  { label: "TRADES", value: trades.length.toString() },
+  { label: "WIN RATE", value: `${getWinRate().toFixed(1)}%` },
+  { label: "NET R", value: `${getNetR().toFixed(1)}R` },
+  {
+    label: "PROFIT FACTOR",
+    value: getProfitFactor() === Infinity
+      ? "∞"
+      : getProfitFactor().toFixed(2)
+  }
+];
+---
+
+<Layout title="LEX8R Journal">
+  <main class="journal">
+
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">LEX₈R TRADING OS</div>
+        <h1>Trading Journal</h1>
+        <p>Record. Analyse. Refine.</p>
+      </div>
+
+      <a href="/" class="back">← Dashboard</a>
+    </header>
+
+    <!-- STATISTICS -->
+
+    <section class="stats">
+      {stats.map((stat) => (
+        <div class="stat-card">
+          <span>{stat.label}</span>
+          <strong>{stat.value}</strong>
+        </div>
+      ))}
+    </section>
+
+    <!-- NEW TRADE -->
+
+    <section class="panel">
+
+      <div class="panel-header">
+        <div>
+          <div class="section-label">TRADE EXECUTION</div>
+          <h2>New Trade</h2>
+        </div>
+
+        <span class="status-dot">● READY</span>
+      </div>
+
+      <form id="tradeForm">
+
+        <div class="form-grid">
+
+          <label>
+            Account
+            <select id="account">
+              <option>Prop Firm — $5,000</option>
+              <option>Prop Firm — $10,000</option>
+              <option>Personal Account</option>
+            </select>
+          </label>
+
+          <label>
+            Date
+            <input id="date" type="date" />
+          </label>
+
+          <label>
+            Instrument
+            <select id="pair">
+              <option>XAUUSD</option>
+            </select>
+          </label>
+
+          <label>
+            Direction
+            <select id="direction">
+              <option>LONG</option>
+              <option>SHORT</option>
+            </select>
+          </label>
+
+          <label>
+            Entry
+            <input id="entry" type="number" step="0.01" placeholder="e.g. 2654.50" />
+          </label>
+
+          <label>
+            Stop Loss
+            <input id="sl" type="number" step="0.01" placeholder="e.g. 2650.00" />
+          </label>
+
+          <label>
+            Take Profit
+            <input id="tp" type="number" step="0.01" placeholder="e.g. 2675.00" />
+nano src/pages/journal.astro          </label>
+
+          <label>
+            Risk %
+            <input id="risk" type="number" step="0.1" value="1" />
+          </label>
+
+          <label>
+            Session
+            <select id="session">
+              <option>London</option>
+              <option>New York</option>
+              <option>Asia</option>
+              <option>London / NY Overlap</option>
+            </select>
+          </label>
+
+          <label>
+            Setup
+            <select id="setup">
+              <option>Liquidity Sweep + MSS</option>
+              <option>POI Rejection</option>
+              <option>Sweep + Displacement</option>
+              <option>Inducement + Sweep</option>
+              <option>BOS + Pullback</option>
+              <option>Other</option>
+            </select>
+          </label>
+
+          <label>
+            Result
+            <select id="result">
+              <option>WIN</option>
+              <option>LOSS</option>
+              <option>BREAKEVEN</option>
+            </select>
+          </label>
+
+          <label>
+            Result in R
+            <input id="resultR" type="number" step="0.1" placeholder="e.g. 4" />
+          </label>
+
+        </div>
+
+        <!-- LEX8R CONFLUENCE -->
+
+        <div class="confluence">
+
+          <div class="section-label">LEX₈R CONFLUENCE</div>
+
+          <div class="checks">
+
+            <label class="check">
+              <input type="checkbox" />
+              <span>Liquidity Sweep</span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" />
+              <span>POI</span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" />
+              <span>MSS</span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" />
+              <span>Displacement</span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" />
+              <span>HTF Alignment</span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" />
+              <span>Volume Confirmation</span>
+            </label>
+
+          </div>
+
+        </div>
+
+        <label class="notes">
+          Trade Notes
+          <textarea
+            id="notes"
+            rows="4"
+            placeholder="Why did you take this trade? What did price do around the POI? What did you execute correctly or incorrectly?"
+          ></textarea>
+        </label>
+
+        <button type="submit">
+          + LOG TRADE
+        </button>
+
+      </form>
+
+    </section>
+
+    <!-- TRADE HISTORY -->
+
+    <section class="panel history">
+
+      <div class="panel-header">
+        <div>
+          <div class="section-label">EXECUTION HISTORY</div>
+          <h2>Recent Trades</h2>
+        </div>
+
+        <span class="count">{trades.length} RECORDS</span>
+      </div>
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>DATE</th>
+              <th>PAIR</th>
+              <th>DIR</th>
+              <th>SETUP</th>
+              <th>SESSION</th>
+              <th>RISK</th>
+              <th>R:R</th>
+              <th>RESULT</th>
+              <th>P&L</th>
+             <th>STATUS</th>
+            </tr>
+          </thead>
+
+          <tbody id="tradeTableBody">
+            {trades.map((trade) => (
+              <tr>
+                <td>{trade.date}</td>
+                <td>{trade.instrument}</td>
+                <td>{trade.direction}</td>
+                <td>{trade.setup}</td>
+                <td>{trade.session}</td>
+                <td>{trade.riskPercent}%</td>
+                <td>
+                  {(() => {
+                    const risk = Math.abs(trade.entry - trade.stopLoss);
+                    const reward = Math.abs(trade.takeProfit - trade.entry);
+                    const rr = risk > 0 ? reward / risk : 0;
+                    return `1:${rr.toFixed(1)}`;
+                  })()}
+                </td>
+                <td>{trade.resultR.toFixed(1)}R</td>
+                <td>{trade.pnl >= 0 ? "+" : ""}${trade.pnl.toFixed(2)}</td>
+                <td>{trade.status}</td>
+              </tr>
+            ))}
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </main>
+
+ <script>
+  import { addTrade } from "../lib/tradeStore";
+  import { calculateTradePnL } from "../lib/accountEngine";
+  import type { TradeStatus } from "../lib/trades";
+
+  const form = document.querySelector("#tradeForm") as HTMLFormElement | null;
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const getInput = (id: string) =>
+      document.querySelector(`#${id}`) as HTMLInputElement;
+
+    const getSelect = (id: string) =>
+      document.querySelector(`#${id}`) as HTMLSelectElement;
+
+    const entry = Number(getInput("entry").value);
+    const stopLoss = Number(getInput("sl").value);
+    const takeProfit = Number(getInput("tp").value);
+    const riskPercent = Number(getInput("risk").value);
+    const resultR = Number(getInput("resultR").value);
+
+    if (
+      !entry ||
+      !stopLoss ||
+      !takeProfit ||
+      !riskPercent ||
+      Number.isNaN(resultR)
+    ) {
+      alert("Complete the required trade fields.");
+      return;
+    }
+
+    const direction = getSelect("direction").value as "LONG" | "SHORT";
+
+    const status: TradeStatus =
+  resultR > 0
+    ? "WIN"
+    : resultR < 0
+      ? "LOSS"
+      : "BREAKEVEN";
+
+    const account = getSelect("account").value;
+
+    const pnl = calculateTradePnL(
+  account,
+  riskPercent,
+  resultR
+);
+
+    const trade = {
+      id: `LEX-${Date.now()}`,
+
+      date: getInput("date").value ||
+        new Date().toISOString().slice(0, 10),
+
+      accountId: account,
+
+      instrument: getSelect("pair").value,
+
+      direction,
+
+      entry,
+      stopLoss,
+      takeProfit,
+
+      riskPercent,
+      resultR,
+      pnl,
+
+      session: getSelect("session").value,
+
+      setup: getSelect("setup").value,
+
+      status,
+
+      confluence: {
+        liquiditySweep:
+          (document.querySelector(
+            ".check:nth-child(1) input"
+          ) as HTMLInputElement)?.checked ?? false,
+
+        poi:
+          (document.querySelector(
+            ".check:nth-child(2) input"
+          ) as HTMLInputElement)?.checked ?? false,
+
+        mss:
+          (document.querySelector(
+            ".check:nth-child(3) input"
+          ) as HTMLInputElement)?.checked ?? false,
+
+        displacement:
+          (document.querySelector(
+            ".check:nth-child(4) input"
+          ) as HTMLInputElement)?.checked ?? false,
+
+        htfAlignment:
+          (document.querySelector(
+            ".check:nth-child(5) input"
+          ) as HTMLInputElement)?.checked ?? false,
+
+        volumeConfirmation:
+          (document.querySelector(
+            ".check:nth-child(6) input"
+          ) as HTMLInputElement)?.checked ?? false,
+      },
+
+      notes:
+        (document.querySelector("#notes") as HTMLTextAreaElement)
+          ?.value ?? "",
+
+      createdAt: new Date().toISOString(),
+    };
+
+    addTrade(trade);
+
+    alert("Trade successfully logged.");
+
+    form.reset();
+  });
+</script>
+
+  <style>
+
+    :global(body) {
+      margin: 0;
+      background: #050608;
+      color: #e8e8e8;
+      font-family: Inter, system-ui, sans-serif;
+    }
+
+    .journal {
+      width: min(1500px, 94%);
+      margin: 0 auto;
+      padding: 42px 0 80px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 35px;
+      border-bottom: 1px solid #202329;
+      padding-bottom: 25px;
+    }
+
+    .eyebrow,
+    .section-label {
+      color: #d7a83d;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      margin: 7px 0 3px;
+      font-size: clamp(32px, 4vw, 48px);
+      letter-spacing: -2px;
+    }
+
+    .topbar p {
+      color: #747982;
+      margin: 0;
+    }
+
+    .back {
+      color: #bfc3ca;
+      text-decoration: none;
+      border: 1px solid #282c32;
+      padding: 11px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .back:hover {
+      border-color: #d7a83d;
+      color: #d7a83d;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: #0b0d10;
+      border: 1px solid #202329;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .stat-card span {
+      display: block;
+      color: #777d86;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      margin-bottom: 9px;
+    }
+
+    .stat-card strong {
+      font-size: 25px;
+      color: #f0f0f0;
+    }
+
+    .panel {
+      background: #090b0e;
+      border: 1px solid #202329;
+      border-radius: 14px;
+      padding: 26px;
+      margin-bottom: 25px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    h2 {
+      margin: 5px 0 0;
+      font-size: 23px;
+    }
+
+    .status-dot {
+      color: #5dd68b;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .count {
+      color: #686e77;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    label {
+      color: #858b94;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .5px;
+    }
+
+    input,
+    select,
+    textarea {
+      display: block;
+      width: 100%;nano src/pages/journal.astro
+      box-sizing: border-box;
+      margin-top: 7px;
+      background: #050608;
+      border: 1px solid #282c32;
+      color: #eee;
+      border-radius: 7px;
+      padding: 12px;
+      outline: none;
+      font: inherit;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #d7a83d;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .confluence {
+      margin: 28px 0;
+      padding: 20px;
+      background: #07090b;
+      border: 1px solid #1c2025;
+      border-radius: 10px;
+    }
+
+    .checks {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #a9adb4;
+      font-size: 12px;
+    }
+
+    .check input {
+      width: auto;
+      margin: 0;
+      accent-color: #d7a83d;
+    }
+
+    .notes {
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    button {
+      border: 0;
+      background: #d7a83d;
+      color: #08090a;
+      padding: 13px 24px;
+      border-radius: 7px;
+      font-weight: 900;
+      letter-spacing: .7px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      filter: brightness(1.1);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1050px;
+    }
+
+    th {
+      text-align: left;
+      color: #656b74;
+      font-size: 9px;
+      letter-spacing: 1.2px;
+      padding: 13px 10px;
+      border-bottom: 1px solid #24282e;
+    }
+
+    td {
+      padding: 16px 10px;
+      border-bottom: 1px solid #171a1e;
+      font-size: 12px;
+      color: #aeb2b9;
+    }
+
+    .gold {
+      color: #d7a83d;
+      font-weight: 700;
+    }
+
+    .long {
+      color: #59d38b;
+      font-weight: 700;
+    }
+
+    .short {
+      color: #ef7777;
+      font-weight: 700;
+    }
+
+    .profit {
+      color: #59d38b;
+    }
+
+    .loss {
+      color: #ef7777;
+    }
+
+    .badge {
+      padding: 5px 8px;
+      border-radius: 5px;
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .badge.win {
+      color: #59d38b;
+      background: rgba(89, 211, 139, .08);
+    }
+
+    .badge.loss {
+      color: #ef7777;
+      background: rgba(239, 119, 119, .08);
+    }
+
+    @media (max-width: 900px) {
+
+      .stats,
+      .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .checks {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+    }
+
+    @media (max-width: 600px) {
+
+      .journal {
+        width: 92%;
+        padding-top: 25px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        gap: 20px;
+        flex-direction: column;
+      }
+
+      .stats,
+      .form-grid,
+      .checks {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+    }
+
+  </style>
+</Layout>

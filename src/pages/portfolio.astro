@@ -1,0 +1,855 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { accounts, resolveAccountId } from "../lib/accounts";
+---
+
+<Layout title="LEX₈R Portfolio">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">8</div>
+        <div>
+          <div class="brand-name">LEX₈R</div>
+          <div class="brand-sub">TRADING OS</div>
+        </div>
+      </div>
+
+      <nav>
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/portfolio" class="nav-link active">Portfolio</a>
+        <a href="/journal" class="nav-link">Journal</a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="system-status">
+          <span class="status-dot"></span>
+          SYSTEM ONLINE
+        </div>
+        <div class="version">LEX₈R OS v1.0</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">LEX₈R TRADING OS</div>
+          <h1>Portfolio</h1>
+          <p>Account intelligence and trading performance.</p>
+        </div>
+
+        <div class="top-actions">
+          <a href="/journal" class="btn secondary">+ NEW TRADE</a>
+        </div>
+      </header>
+
+      <section class="overview-grid">
+        <div class="overview-card">
+          <span>TOTAL EQUITY</span>
+          <strong id="totalEquity">$0.00</strong>
+        </div>
+
+        <div class="overview-card">
+          <span>TOTAL P&L</span>
+          <strong id="totalPnl">$0.00</strong>
+        </div>
+
+        <div class="overview-card">
+          <span>NET R</span>
+          <strong id="totalR">0.0R</strong>
+        </div>
+
+        <div class="overview-card">
+          <span>TOTAL TRADES</span>
+          <strong id="totalTrades">0</strong>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">ACCOUNT INTELLIGENCE</div>
+            <h2>Trading Accounts</h2>
+          </div>
+        </div>
+
+        <div class="accounts-grid">
+          {accounts.map((account) => (
+            <article
+              class="account-card"
+              data-account-id={account.id}
+            >
+              <div class="account-header">
+                <div>
+                  <span class="account-type">{account.type}</span>
+                  <h3>{account.name}</h3>
+                  <p>{account.firm}</p>
+                </div>
+
+                <span class={`account-status ${account.status.toLowerCase()}`}>
+                  {account.status}
+                </span>
+              </div>
+
+              <div class="equity-block">
+                <span>LIVE EQUITY</span>
+                <strong class="account-equity">
+                  ${account.startingBalance.toFixed(2)}
+                </strong>
+              </div>
+
+              <div class="metrics-grid">
+                <div class="metric">
+                  <span>P&L</span>
+                  <strong class="account-pnl">$0.00</strong>
+                </div>
+
+                <div class="metric">
+                  <span>TRADES</span>
+                  <strong class="account-trades">0</strong>
+                </div>
+
+                <div class="metric">
+                  <span>WIN RATE</span>
+                  <strong class="account-winrate">0.0%</strong>
+                </div>
+
+                <div class="metric">
+                  <span>NET R</span>
+                  <strong class="account-r">0.0R</strong>
+                </div>
+
+                <div class="metric">
+                  <span>AVG R</span>
+                  <strong class="account-avgr">0.0R</strong>
+                </div>
+
+                <div class="metric">
+                  <span>PROFIT FACTOR</span>
+                  <strong class="account-pf">0.00</strong>
+                </div>
+              </div>
+
+              <div class="progress-section">
+                <div class="progress-label">
+                  <span>PROFIT TARGET</span>
+                  <strong class="target-value">0.0%</strong>
+                </div>
+
+                <div class="progress-track">
+                  <div class="progress-fill target-fill"></div>
+                </div>
+              </div>
+
+              <div class="progress-section">
+                <div class="progress-label">
+                  <span>DRAWDOWN</span>
+                  <strong class="drawdown-value">0.0%</strong>
+                </div>
+
+                <div class="progress-track danger-track">
+                  <div class="progress-fill drawdown-fill"></div>
+                </div>
+              </div>
+
+              <div class="risk-row">
+                <div>
+                  <span>DAILY LOSS REMAINING</span>
+                  <strong class="daily-loss">$0.00</strong>
+                </div>
+
+                <div>
+                  <span>RISK / TRADE</span>
+                  <strong>{account.riskPerTrade.toFixed(1)}%</strong>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
+  </div>
+</Layout>
+
+<script>
+  import { accounts, resolveAccountId } from "../lib/accounts";
+  import { loadTrades } from "../lib/tradeStore";
+  import {
+    calculateAnalytics
+  } from "../lib/analyticsEngine";
+
+  import {
+    calculateRiskAmount
+  } from "../lib/accountEngine";
+
+  function money(value: number): string {
+    const sign = value < 0 ? "-" : "";
+
+    return `${sign}$${Math.abs(value).toFixed(2)}`;
+  }
+
+  function signedR(value: number): string {
+    return `${value >= 0 ? "+" : ""}${value.toFixed(2)}R`;
+  }
+
+  function updatePortfolio() {
+    const trades = loadTrades();
+
+    let totalPnl = 0;
+    let totalR = 0;
+
+    accounts.forEach((account) => {
+      const card = document.querySelector(
+        `[data-account-id="${account.id}"]`
+      );
+
+      if (!card) return;
+
+      const accountTrades = trades.filter(
+        (trade) =>
+          resolveAccountId(trade.accountId) === account.id
+      );
+
+      const analytics = calculateAnalytics(accountTrades);
+
+      const pnl = analytics.totalPnL;
+      const equity = account.startingBalance + pnl;
+
+      totalPnl += pnl;
+      totalR += analytics.netR;
+
+      const drawdown =
+        equity < account.startingBalance
+          ? account.startingBalance - equity
+          : 0;
+
+      const drawdownPercent =
+        account.startingBalance > 0
+          ? (drawdown / account.startingBalance) * 100
+          : 0;
+
+      const targetProgress =
+        account.profitTarget > 0
+          ? Math.min(
+              Math.max(
+                (pnl / account.profitTarget) * 100,
+                0
+              ),
+              100
+            )
+          : 0;
+
+      const dailyLossRemaining =
+        Math.max(
+          account.dailyLossLimit -
+            Math.max(-pnl, 0),
+          0
+        );
+
+      const equityEl =
+        card.querySelector(".account-equity");
+
+      const pnlEl =
+        card.querySelector(".account-pnl");
+
+      const tradesEl =
+        card.querySelector(".account-trades");
+
+      const winrateEl =
+        card.querySelector(".account-winrate");
+
+      const rEl =
+        card.querySelector(".account-r");
+
+      const avgREl =
+        card.querySelector(".account-avgr");
+
+      const pfEl =
+        card.querySelector(".account-pf");
+
+      const targetEl =
+        card.querySelector(".target-value");
+
+      const targetFill =
+        card.querySelector(".target-fill") as HTMLElement | null;
+
+      const drawdownEl =
+        card.querySelector(".drawdown-value");
+
+      const drawdownFill =
+        card.querySelector(".drawdown-fill") as HTMLElement | null;
+
+      const dailyLossEl =
+        card.querySelector(".daily-loss");
+
+      if (equityEl) {
+        equityEl.textContent = money(equity);
+      }
+
+      if (pnlEl) {
+        pnlEl.textContent = money(pnl);
+        pnlEl.classList.toggle("positive", pnl > 0);
+        pnlEl.classList.toggle("negative", pnl < 0);
+      }
+
+      if (tradesEl) {
+        tradesEl.textContent =
+          analytics.totalTrades.toString();
+      }
+
+      if (winrateEl) {
+        winrateEl.textContent =
+          `${analytics.winRate.toFixed(1)}%`;
+      }
+
+      if (rEl) {
+        rEl.textContent =
+          signedR(analytics.netR);
+      }
+
+      if (avgREl) {
+        avgREl.textContent =
+          signedR(analytics.averageR);
+      }
+
+      if (pfEl) {
+        pfEl.textContent =
+          analytics.profitFactor === Infinity
+            ? "∞"
+            : analytics.profitFactor.toFixed(2);
+      }
+
+      if (targetEl) {
+        targetEl.textContent =
+          `${targetProgress.toFixed(1)}%`;
+      }
+
+      if (targetFill) {
+        targetFill.style.width =
+          `${targetProgress}%`;
+      }
+
+      if (drawdownEl) {
+        drawdownEl.textContent =
+          `${drawdownPercent.toFixed(1)}%`;
+      }
+
+      if (drawdownFill) {
+        drawdownFill.style.width =
+          `${Math.min(drawdownPercent, 100)}%`;
+      }
+
+      if (dailyLossEl) {
+        dailyLossEl.textContent =
+          money(dailyLossRemaining);
+      }
+
+      const riskAmount =
+        calculateRiskAmount(
+          account.id,
+          account.riskPerTrade
+        );
+
+      card.setAttribute(
+        "data-risk-amount",
+        riskAmount.toFixed(2)
+      );
+    });
+
+    const totalEquity =
+      accounts.reduce(
+        (total, account) =>
+          total + account.startingBalance,
+        0
+      ) + totalPnl;
+
+    const totalEquityEl =
+      document.querySelector("#totalEquity");
+
+    const totalPnlEl =
+      document.querySelector("#totalPnl");
+
+    const totalREl =
+      document.querySelector("#totalR");
+
+    const totalTradesEl =
+      document.querySelector("#totalTrades");
+
+    if (totalEquityEl) {
+      totalEquityEl.textContent =
+        money(totalEquity);
+    }
+
+    if (totalPnlEl) {
+      totalPnlEl.textContent =
+        money(totalPnl);
+
+      totalPnlEl.classList.toggle(
+        "positive",
+        totalPnl > 0
+      );
+
+      totalPnlEl.classList.toggle(
+        "negative",
+        totalPnl < 0
+      );
+    }
+
+    if (totalREl) {
+      totalREl.textContent =
+        signedR(totalR);
+    }
+
+    if (totalTradesEl) {
+      totalTradesEl.textContent =
+        trades.length.toString();
+    }
+  }
+
+  updatePortfolio();
+
+  window.addEventListener(
+    "storage",
+    (event) => {
+      if (event.key === "lex8r_trades") {
+        updatePortfolio();
+      }
+    }
+  );
+
+  window.addEventListener(
+    "focus",
+    updatePortfolio
+  );
+</script>
+
+<style>
+  :global(*) {
+    box-sizing: border-box;
+  }
+
+  :global(body) {
+    margin: 0;
+    background: #050505;
+    color: #f4f4f4;
+    font-family:
+      Inter,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+  }
+
+  .app-shell {
+    min-height: 100vh;
+    display: flex;
+    background:
+      radial-gradient(
+        circle at 80% 10%,
+        rgba(0, 140, 255, 0.08),
+        transparent 30%
+      ),
+      #050505;
+  }
+
+  .sidebar {
+    width: 240px;
+    min-height: 100vh;
+    border-right: 1px solid #1b1b1b;
+    background: #080808;
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #d6b35a;
+    display: grid;
+    place-items: center;
+    color: #d6b35a;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .brand-name {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .brand-sub {
+    margin-top: 3px;
+    color: #666;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+  }
+
+  nav {
+    display: grid;
+    gap: 7px;
+  }
+
+  .nav-link {
+    color: #777;
+    text-decoration: none;
+    padding: 12px 13px;
+    border: 1px solid transparent;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: #f4f4f4;
+    border-color: #242424;
+    background: #101010;
+  }
+
+  .nav-link.active {
+    color: #d6b35a;
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+  }
+
+  .system-status {
+    color: #777;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4bd37b;
+    box-shadow: 0 0 10px rgba(75, 211, 123, 0.6);
+  }
+
+  .version {
+    margin-top: 10px;
+    color: #444;
+    font-size: 9px;
+  }
+
+  .main {
+    flex: 1;
+    min-width: 0;
+    padding: 34px;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .eyebrow {
+    color: #d6b35a;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+  }
+
+  h1 {
+    margin: 8px 0 4px;
+    font-size: clamp(30px, 4vw, 48px);
+    letter-spacing: -0.04em;
+  }
+
+  h2 {
+    margin: 6px 0 0;
+    font-size: 22px;
+  }
+
+  .topbar p {
+    margin: 0;
+    color: #666;
+    font-size: 13px;
+  }
+
+  .btn {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 15px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+  }
+
+  .btn.secondary {
+    color: #d6b35a;
+    border: 1px solid #493d20;
+    background: #0c0b08;
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 42px;
+  }
+
+  .overview-card {
+    border: 1px solid #1b1b1b;
+    background: linear-gradient(
+      145deg,
+      #101010,
+      #090909
+    );
+    padding: 20px;
+  }
+
+  .overview-card span,
+  .metric span,
+  .equity-block span,
+  .risk-row span {
+    display: block;
+    color: #666;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .overview-card strong {
+    display: block;
+    margin-top: 12px;
+    font-size: 24px;
+    letter-spacing: -0.03em;
+  }
+
+  .section-heading {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .accounts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .account-card {
+    border: 1px solid #1c1c1c;
+    background:
+      linear-gradient(
+        145deg,
+        rgba(214, 179, 90, 0.035),
+        transparent 35%
+      ),
+      #0a0a0a;
+    padding: 20px;
+  }
+
+  .account-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .account-type {
+    color: #d6b35a;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    font-weight: 800;
+  }
+
+  .account-header h3 {
+    margin: 7px 0 3px;
+    font-size: 18px;
+  }
+
+  .account-header p {
+    margin: 0;
+    color: #555;
+    font-size: 11px;
+  }
+
+  .account-status {
+    height: fit-content;
+    border: 1px solid #222;
+    padding: 5px 7px;
+    color: #777;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  .account-status.active,
+  .account-status.funded {
+    color: #5fd78b;
+    border-color: rgba(95, 215, 139, 0.25);
+  }
+
+  .account-status.evaluation {
+    color: #d6b35a;
+    border-color: rgba(214, 179, 90, 0.25);
+  }
+
+  .equity-block {
+    border-top: 1px solid #171717;
+    border-bottom: 1px solid #171717;
+    margin: 18px 0;
+    padding: 16px 0;
+  }
+
+  .equity-block strong {
+    display: block;
+    margin-top: 7px;
+    font-size: 29px;
+    letter-spacing: -0.04em;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid #161616;
+  }
+
+  .metric {
+    padding: 12px;
+    border-right: 1px solid #161616;
+    border-bottom: 1px solid #161616;
+  }
+
+  .metric:nth-child(3n) {
+    border-right: 0;
+  }
+
+  .metric:nth-child(n + 4) {
+    border-bottom: 0;
+  }
+
+  .metric strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 14px;
+  }
+
+  .positive {
+    color: #62d78d !important;
+  }
+
+  .negative {
+    color: #ff6b6b !important;
+  }
+
+  .progress-section {
+    margin-top: 17px;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  .progress-label strong {
+    color: #aaa;
+  }
+
+  .progress-track {
+    height: 5px;
+    margin-top: 8px;
+    background: #171717;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0;
+    background: #d6b35a;
+    transition: width 0.3s ease;
+  }
+
+  .danger-track .progress-fill {
+    background: #ff6b6b;
+  }
+
+  .risk-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+    padding-top: 15px;
+    border-top: 1px solid #171717;
+  }
+
+  .risk-row strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #bbb;
+  }
+
+  @media (max-width: 1100px) {
+    .accounts-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 850px) {
+    .sidebar {
+      display: none;
+    }
+
+    .main {
+      padding: 22px;
+    }
+
+    .overview-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .accounts-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .main {
+      padding: 16px;
+    }
+
+    .topbar {
+      flex-direction: column;
+    }
+
+    .overview-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .metrics-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .metric:nth-child(3n) {
+      border-right: 1px solid #161616;
+    }
+
+    .metric:nth-child(2n) {
+      border-right: 0;
+    }
+  }
+</style>O
+

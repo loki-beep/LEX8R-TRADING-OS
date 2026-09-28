@@ -1,0 +1,1063 @@
+---
+interface Props {}
+
+const {} = Astro.props;
+---
+
+<div class="calendar-shell">
+  <!-- Calendar Header -->
+  <div class="calendar-header">
+    <div>
+      <div class="calendar-eyebrow">
+        <span class="calendar-dot"></span>
+        PERFORMANCE
+      </div>
+
+      <h2 id="calendar-month">September 2026</h2>
+
+      <p>Daily trading performance and execution history</p>
+    </div>
+
+    <div class="calendar-actions">
+      <button id="today-btn" type="button">Today</button>
+
+      <button id="prev-month" type="button" aria-label="Previous month">
+        ‹
+      </button>
+
+      <button id="next-month" type="button" aria-label="Next month">
+        ›
+      </button>
+    </div>
+  </div>
+
+  <!-- Monthly Statistics -->
+  <div class="calendar-stats">
+    <div class="stat-card">
+      <span>Net P&amp;L</span>
+      <strong id="stat-pnl">$0</strong>
+    </div>
+
+    <div class="stat-card">
+      <span>Win Rate</span>
+      <strong id="stat-winrate">0%</strong>
+    </div>
+
+    <div class="stat-card">
+      <span>Trades</span>
+      <strong id="stat-trades">0</strong>
+    </div>
+
+    <div class="stat-card">
+      <span>Net R</span>
+      <strong id="stat-r">0R</strong>
+    </div>
+
+    <div class="stat-card">
+      <span>Best Day</span>
+      <strong id="stat-best">$0</strong>
+    </div>
+  </div>
+
+  <!-- Calendar -->
+  <div class="calendar-card">
+    <div class="weekdays">
+      <span>Sun</span>
+      <span>Mon</span>
+      <span>Tue</span>
+      <span>Wed</span>
+      <span>Thu</span>
+      <span>Fri</span>
+      <span>Sat</span>
+    </div>
+
+    <div id="calendar-grid" class="calendar-grid"></div>
+  </div>
+
+  <!-- Selected Day -->
+  <section id="selected-day" class="selected-day">
+    <div class="selected-empty">
+      Select a trading day to view its execution details.
+    </div>
+  </section>
+</div>
+
+<script>
+  import { loadTrades } from "../lib/tradeStore";
+  const calendarMonth = document.querySelector("#calendar-month");
+  const calendarGrid = document.querySelector("#calendar-grid");
+
+  const todayBtn = document.querySelector("#today-btn");
+  const prevBtn = document.querySelector("#prev-month");
+  const nextBtn = document.querySelector("#next-month");
+
+  const statPnl = document.querySelector("#stat-pnl");
+  const statWinrate = document.querySelector("#stat-winrate");
+  const statTrades = document.querySelector("#stat-trades");
+  const statR = document.querySelector("#stat-r");
+  const statBest = document.querySelector("#stat-best");
+
+  const selectedDay = document.querySelector("#selected-day");
+
+  let currentDate = new Date(2026, 8, 28);
+  let selectedDate = "2026-09-28";
+
+  const allTrades = loadTrades();
+
+  function pad(value) {
+    return String(value).padStart(2, "0");
+  }
+
+  function dateKey(year, month, day) {
+    return `${year}-${pad(month + 1)}-${pad(day)}`;
+  }
+
+  function formatMoney(value) {
+    const amount = Math.abs(value).toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+
+    if (value > 0) return `+$${amount}`;
+    if (value < 0) return `-$${amount}`;
+    return "$0";
+  }
+
+  function formatR(value) {
+    if (value > 0) return `+${value.toFixed(1)}R`;
+    if (value < 0) return `${value.toFixed(1)}R`;
+    return "0R";
+  }
+
+  function getTradesForDate(key) {
+    return allTrades.filter((trade) => trade.date === key);
+  }
+
+  function getMonthTrades() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    return allTrades.filter((trade) => {
+      const date = new Date(`${trade.date}T00:00:00`);
+      return (
+        date.getFullYear() === year &&
+        date.getMonth() === month
+      );
+    });
+  }
+
+  function updateStats() {
+    const monthTrades = getMonthTrades();
+
+    const pnl = monthTrades.reduce(
+      (sum, trade) => sum + Number(trade.pnl || 0),
+      0
+    );
+
+    const netR = monthTrades.reduce(
+      (sum, trade) => sum + Number(trade.resultR || 0),
+      0
+    );
+
+    const wins = monthTrades.filter(
+      (trade) => trade.status === "WIN"
+    ).length;
+
+    const winRate =
+      monthTrades.length > 0
+        ? (wins / monthTrades.length) * 100
+        : 0;
+
+    const dailyPnL = {};
+
+    monthTrades.forEach((trade) => {
+      dailyPnL[trade.date] =
+        (dailyPnL[trade.date] || 0) + Number(trade.pnl || 0);
+    });
+
+    const bestDay =
+      Object.values(dailyPnL).length > 0
+        ? Math.max(...Object.values(dailyPnL))
+        : 0;
+
+    statPnl.textContent = formatMoney(pnl);
+    statPnl.className =
+      pnl > 0
+        ? "positive"
+        : pnl < 0
+          ? "negative"
+          : "";
+
+    statWinrate.textContent = `${winRate.toFixed(1)}%`;
+    statTrades.textContent = monthTrades.length;
+    statR.textContent = formatR(netR);
+
+    statR.className =
+      netR > 0
+        ? "positive"
+        : netR < 0
+          ? "negative"
+          : "";
+
+    statBest.textContent = formatMoney(bestDay);
+    statBest.className =
+      bestDay > 0
+        ? "positive"
+        : bestDay < 0
+          ? "negative"
+          : "";
+  }
+
+  function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    calendarMonth.textContent = currentDate.toLocaleDateString(
+      "en-US",
+      {
+        month: "long",
+        year: "numeric",
+      }
+    );
+
+    calendarGrid.innerHTML = "";
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(
+      year,
+      month + 1,
+      0
+    ).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement("div");
+      empty.className = "calendar-cell empty";
+      calendarGrid.appendChild(empty);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const key = dateKey(year, month, day);
+      const dayTrades = getTradesForDate(key);
+
+      const pnl = dayTrades.reduce(
+        (sum, trade) => sum + Number(trade.pnl || 0),
+        0
+      );
+
+      const netR = dayTrades.reduce(
+        (sum, trade) => sum + Number(trade.resultR || 0),
+        0
+      );
+
+      const wins = dayTrades.filter(
+        (trade) => trade.status === "WIN"
+      ).length;
+
+      const losses = dayTrades.filter(
+        (trade) => trade.status === "LOSS"
+      ).length;
+
+      const isToday =
+        key === new Date().toISOString().slice(0, 10);
+
+      const isSelected = key === selectedDate;
+
+      const cell = document.createElement("button");
+      cell.type = "button";
+
+      let state = "neutral";
+
+      if (pnl > 0) state = "profit";
+      if (pnl < 0) state = "loss";
+
+      cell.className =
+        `calendar-cell ${state} ${
+          isSelected ? "selected" : ""
+        } ${isToday ? "today" : ""}`;
+
+      const top = document.createElement("div");
+      top.className = "day-top";
+
+      const dateNumber = document.createElement("span");
+      dateNumber.className = "date-number";
+      dateNumber.textContent = day;
+
+      top.appendChild(dateNumber);
+
+      if (dayTrades.length > 0) {
+        const tradeCount = document.createElement("span");
+        tradeCount.className = "trade-count";
+        tradeCount.textContent =
+          `${dayTrades.length} ${dayTrades.length === 1 ? "TRADE" : "TRADES"}`;
+        top.appendChild(tradeCount);
+      }
+
+      cell.appendChild(top);
+
+      if (dayTrades.length === 0) {
+        const emptyLabel = document.createElement("div");
+        emptyLabel.className = "no-trades";
+        emptyLabel.textContent = "NO TRADES";
+        cell.appendChild(emptyLabel);
+      } else {
+        const result = document.createElement("div");
+        result.className = "day-result";
+
+        if (pnl > 0) {
+          result.textContent = "WIN";
+        } else if (pnl < 0) {
+          result.textContent = "LOSS";
+        } else {
+          result.textContent = "BREAKEVEN";
+        }
+
+        cell.appendChild(result);
+
+        const pnlValue = document.createElement("div");
+        pnlValue.className = "day-pnl";
+        pnlValue.textContent = formatMoney(pnl);
+        cell.appendChild(pnlValue);
+
+        const rValue = document.createElement("div");
+        rValue.className = "day-r";
+        rValue.textContent = formatR(netR);
+        cell.appendChild(rValue);
+
+        const meta = document.createElement("div");
+        meta.className = "day-meta";
+
+        const winsText = wins > 0 ? `W ${wins}` : "";
+        const lossesText = losses > 0 ? `L ${losses}` : "";
+
+        meta.textContent =
+          [winsText, lossesText]
+            .filter(Boolean)
+            .join("  ·  ");
+
+        cell.appendChild(meta);
+      }
+
+      cell.addEventListener("click", () => {
+        selectedDate = key;
+        renderCalendar();
+        renderSelectedDay();
+      });
+
+      calendarGrid.appendChild(cell);
+    }
+
+    updateStats();
+  }
+
+  function renderSelectedDay() {
+    const dayTrades = getTradesForDate(selectedDate);
+
+    const date = new Date(`${selectedDate}T00:00:00`);
+
+    const readableDate = date.toLocaleDateString(
+      "en-US",
+      {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }
+    );
+
+    if (dayTrades.length === 0) {
+      selectedDay.innerHTML = `
+        <div class="selected-header">
+          <div>
+            <span class="selected-eyebrow">SELECTED DAY</span>
+            <h3>${readableDate}</h3>
+          </div>
+        </div>
+
+        <div class="selected-empty">
+          No trades recorded for this day.
+        </div>
+      `;
+
+      return;
+    }
+
+    const pnl = dayTrades.reduce(
+      (sum, trade) => sum + Number(trade.pnl || 0),
+      0
+    );
+
+    const netR = dayTrades.reduce(
+      (sum, trade) => sum + Number(trade.resultR || 0),
+      0
+    );
+
+    selectedDay.innerHTML = `
+      <div class="selected-header">
+        <div>
+          <span class="selected-eyebrow">SELECTED DAY</span>
+          <h3>${readableDate}</h3>
+        </div>
+
+        <div class="selected-summary">
+          <div>
+            <span>P&amp;L</span>
+            <strong class="${pnl >= 0 ? "positive" : "negative"}">
+              ${formatMoney(pnl)}
+            </strong>
+          </div>
+
+          <div>
+            <span>RESULT</span>
+            <strong>${formatR(netR)}</strong>
+          </div>
+
+          <div>
+            <span>TRADES</span>
+            <strong>${dayTrades.length}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="trade-list">
+        ${dayTrades
+          .map(
+            (trade) => `
+              <div class="trade-row">
+                <div class="trade-main">
+                  <div class="trade-instrument">
+                    ${trade.instrument}
+                    <span>${trade.direction}</span>
+                  </div>
+
+                  <div class="trade-setup">
+                    ${trade.session || "Session"} ·
+                    ${trade.setup || "Trading setup"}
+                  </div>
+                </div>
+
+                <div class="trade-result">
+                  <strong class="${
+                    Number(trade.pnl) >= 0
+                      ? "positive"
+                      : "negative"
+                  }">
+                    ${formatMoney(Number(trade.pnl || 0))}
+                  </strong>
+
+                  <span>
+                    ${formatR(Number(trade.resultR || 0))}
+                  </span>
+                </div>
+              </div>
+            `
+          )
+          .join("")}
+      </div>
+    `;
+  }
+
+  prevBtn.addEventListener("click", () => {
+    currentDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - 1,
+      1
+    );
+
+    selectedDate = dateKey(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    );
+
+    renderCalendar();
+    renderSelectedDay();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    currentDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      1
+    );
+
+    selectedDate = dateKey(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    );
+
+    renderCalendar();
+    renderSelectedDay();
+  });
+
+  todayBtn.addEventListener("click", () => {
+    const now = new Date();
+
+    currentDate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      1
+    );
+
+    selectedDate = dateKey(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
+    renderCalendar();
+    renderSelectedDay();
+  });
+
+  renderCalendar();
+  renderSelectedDay();
+</script>
+
+<style>
+  .calendar-shell {
+    width: 100%;
+    color: var(--foreground);
+  }
+
+  .calendar-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .calendar-eyebrow,
+  .selected-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+  }
+
+  .calendar-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--primary);
+  }
+
+  .calendar-header h2 {
+    margin: 0;
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+  }
+
+  .calendar-header p {
+    margin: 6px 0 0;
+    color: var(--muted-foreground);
+    font-size: 13px;
+  }
+
+  .calendar-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .calendar-actions button {
+    min-width: 38px;
+    height: 38px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--foreground);
+    border-radius: 7px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.15s ease;
+  }
+
+  .calendar-actions button:hover {
+    background: var(--secondary);
+    border-color: var(--primary);
+  }
+
+  #today-btn {
+    padding: 0 14px;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+
+  .calendar-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--border);
+    border-radius: 9px;
+  }
+
+  .stat-card {
+    min-height: 76px;
+    padding: 14px 16px;
+    background: var(--card);
+  }
+
+  .stat-card span {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--muted-foreground);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .stat-card strong {
+    font-size: 19px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .positive {
+    color: #22c55e !important;
+  }
+
+  .negative {
+    color: #ef4444 !important;
+  }
+
+  .calendar-card {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--card);
+  }
+
+  .weekdays,
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .weekdays {
+    border-bottom: 1px solid var(--border);
+    background: var(--secondary);
+  }
+
+  .weekdays span {
+    padding: 11px 8px;
+    color: var(--muted-foreground);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .calendar-grid {
+    gap: 10px;
+    padding: 10px;
+    background: var(--background);
+  }
+
+  :global(.calendar-cell) {
+    position: relative;
+    min-width: 0;
+    min-height: 138px;
+    padding: 12px;
+    border: 2px solid #3a4352 !important;
+    border-radius: 10px !important;
+    background: #0b0f15;
+    color: var(--foreground);
+    text-align: left;
+    cursor: pointer;
+    box-shadow:
+      inset 0 0 0 1px #171d27,
+      0 3px 10px rgba(0, 0, 0, 0.35);
+    transition:
+      background 0.15s ease,
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  :global(.calendar-cell:hover) {
+    z-index: 2;
+    border-color: #d5aa3f !important;
+    transform: translateY(-1px);
+    background: var(--secondary);
+  }
+
+  :global(.calendar-cell.empty) {
+    cursor: default;
+    border: 2px solid #252c37 !important;
+    background: color-mix(
+      in srgb,
+      var(--card) 70%,
+      var(--background)
+    );
+  }
+
+  :global(.calendar-cell.profit) {
+    background: color-mix(
+      in srgb,
+      #22c55e 10%,
+      var(--card)
+    );
+    box-shadow: inset 4px 0 0 #22c55e;
+  }
+
+  :global(.calendar-cell.loss) {
+    background: color-mix(
+      in srgb,
+      #ef4444 10%,
+      var(--card)
+    );
+    box-shadow: inset 4px 0 0 #ef4444;
+  }
+
+  :global(.calendar-cell.selected) {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+  }
+
+  .calendar-cell.today::after {
+    content: "";
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--primary);
+  }
+
+  .day-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 24px;
+  }
+
+  :global(.date-number) {
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  :global(.trade-count) {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-left: auto;
+    padding: 4px 6px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--secondary);
+    color: var(--muted-foreground);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  :global(.day-result) {
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 18px;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+  }
+
+  .profit .day-result,
+  .profit .day-pnl {
+    color: #22c55e;
+  }
+
+  .loss .day-result,
+  .loss .day-pnl {
+    color: #ef4444;
+  }
+
+  :global(.day-pnl) {
+    font-size: 21px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    margin-top: 5px;
+    overflow: hidden;
+    font-size: clamp(20px, 2.1vw, 27px);
+    line-height: 1;
+    font-weight: 950;
+    letter-spacing: -0.055em;
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :global(.day-r) {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    margin-top: 8px;
+    color: var(--muted-foreground);
+    font-size: 10px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  :global(.day-meta) {
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    margin-top: 11px;
+    color: var(--muted-foreground);
+    font-size: 9px;
+    font-weight: 800;
+  }
+
+  .no-trades {
+    margin-top: 48px;
+    color: var(--muted-foreground);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+  }
+
+  .selected-day {
+    margin-top: 18px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--card);
+  }
+
+  .selected-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .selected-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 900;
+  }
+
+  .selected-summary {
+    display: flex;
+    gap: 28px;
+  }
+
+  .selected-summary span {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted-foreground);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+  }
+
+  .selected-summary strong {
+    font-size: 15px;
+    font-weight: 900;
+  }
+
+  .selected-empty {
+    padding: 24px;
+    color: var(--muted-foreground);
+    font-size: 12px;
+  }
+
+  .trade-list {
+    padding: 8px 20px;
+  }
+
+  .trade-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .trade-row:last-child {
+    border-bottom: 0;
+  }
+
+  .trade-instrument {
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .trade-instrument span {
+    margin-left: 7px;
+    color: var(--muted-foreground);
+    font-size: 9px;
+    font-weight: 800;
+  }
+
+  .trade-setup {
+    margin-top: 4px;
+    color: var(--muted-foreground);
+    font-size: 10px;
+  }
+
+  .trade-result {
+    text-align: right;
+  }
+
+  .trade-result strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .trade-result span {
+    color: var(--muted-foreground);
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  @media (max-width: 800px) {
+    .calendar-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    :global(.calendar-cell) {
+      min-height: 108px;
+      padding: 9px;
+      border-radius: 7px;
+    }
+
+    :global(.day-pnl) {
+    font-size: 21px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+      font-size: 17px;
+    }
+
+    :global(.day-result) {
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+      margin-top: 12px;
+      font-size: 8px;
+    }
+
+    .day-meta,
+    :global(.day-r) {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+      font-size: 8px;
+    }
+
+    :global(.trade-count) {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+      font-size: 7px;
+      padding: 3px 4px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .calendar-header {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .calendar-actions {
+      width: 100%;
+    }
+
+    .calendar-actions button:first-child {
+      flex: 1;
+    }
+
+    .weekdays span {
+      font-size: 7px;
+      padding: 9px 2px;
+    }
+
+    .calendar-grid {
+      gap: 6px;
+      padding: 6px;
+    }
+
+    :global(.calendar-cell) {
+      min-height: 92px;
+      padding: 7px;
+      border-radius: 7px !important;
+      border-width: 2px !important;
+    }
+
+    :global(.date-number) {
+      font-size: 12px;
+    }
+
+    :global(.trade-count) {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+      display: none;
+    }
+
+    :global(.day-result) {
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+      margin-top: 10px;
+      font-size: 7px;
+    }
+
+    :global(.day-pnl) {
+    font-size: 21px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+      font-size: 13px;
+    }
+
+    .day-r,
+    :global(.day-meta) {
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+      margin-top: 5px;
+      font-size: 7px;
+    }
+
+    .no-trades {
+      margin-top: 32px;
+      font-size: 6px;
+    }
+
+    .selected-header {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .selected-summary {
+      width: 100%;
+      justify-content: space-between;
+      gap: 8px;
+    }
+  }
+</style>

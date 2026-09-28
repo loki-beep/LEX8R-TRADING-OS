@@ -1,0 +1,1633 @@
+---
+import Layout from "../layouts/Layout.astro";
+import EquityChart from "../components/EquityChart.astro";
+---
+
+<Layout title="LEX₈R Analytics">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">8</div>
+        <div>
+          <div class="brand-name">LEX₈R</div>
+          <div class="brand-sub">TRADING OS</div>
+        </div>
+      </div>
+
+      <nav>
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/portfolio" class="nav-link">Portfolio</a>
+        <a href="/journal" class="nav-link">Journal</a>
+        <a href="/analytics" class="nav-link active">Analytics</a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="system-status">
+          <span class="status-dot"></span>
+          SYSTEM ONLINE
+        </div>
+        <div class="version">LEX₈R OS v1.0</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">LEX₈R TRADING OS</div>
+          <h1>Analytics</h1>
+          <p>Measure the system. Identify the edge. Refine execution.</p>
+        </div>
+
+        <a href="/journal" class="btn">
+          + NEW TRADE
+        </a>
+      </header>
+
+      <!-- EQUITY CURVE -->
+      <section class="section">
+        <EquityChart />
+      </section>
+
+      <!-- PERFORMANCE -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">PERFORMANCE</div>
+            <h2>Trading Statistics</h2>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span>TOTAL TRADES</span>
+            <strong id="totalTrades">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>WIN RATE</span>
+            <strong id="winRate">0.0%</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>NET R</span>
+            <strong id="netR">0.00R</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>AVERAGE R</span>
+            <strong id="averageR">0.00R</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>PROFIT FACTOR</span>
+            <strong id="profitFactor">0.00</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>TOTAL P&L</span>
+            <strong id="totalPnl">$0.00</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRADING CALENDAR -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">TRADING CALENDAR</div>
+            <h2>Daily Performance</h2>
+            <p>Track execution quality across every trading day.</p>
+          </div>
+        </div>
+
+        <div id="tradingCalendar" class="calendar"></div>
+
+        <div id="dayDetails" class="day-details">
+          <div class="empty-day">
+            Select a trading day to inspect performance.
+          </div>
+        </div>
+      </section>
+
+      <!-- TRADE QUALITY -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">TRADE QUALITY</div>
+            <h2>Execution Profile</h2>
+          </div>
+        </div>
+
+        <div class="quality-grid">
+          <div class="quality-card">
+            <span>WINNING TRADES</span>
+            <strong id="winningTrades">0</strong>
+          </div>
+
+          <div class="quality-card">
+            <span>LOSING TRADES</span>
+            <strong id="losingTrades">0</strong>
+          </div>
+
+          <div class="quality-card">
+            <span>BREAKEVEN</span>
+            <strong id="breakevenTrades">0</strong>
+          </div>
+
+          <div class="quality-card">
+            <span>AVG WIN</span>
+            <strong id="averageWin">0.00R</strong>
+          </div>
+
+          <div class="quality-card">
+            <span>AVG LOSS</span>
+            <strong id="averageLoss">0.00R</strong>
+          </div>
+
+          <div class="quality-card">
+            <span>BEST TRADE</span>
+            <strong id="bestTrade">0.00R</strong>
+          </div>
+
+          <div class="quality-card">
+            <span>WORST TRADE</span>
+            <strong id="worstTrade">0.00R</strong>
+          </div>
+
+          <div class="quality-card">
+            <span>AVG P&L</span>
+            <strong id="averagePnl">$0.00</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- SESSION ANALYSIS -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">SESSION ANALYSIS</div>
+            <h2>Performance by Session</h2>
+          </div>
+        </div>
+
+        <div class="analysis-grid">
+          <div class="analysis-card" data-session="London">
+            <div class="analysis-header">
+              <div>
+                <span>SESSION</span>
+                <h3>London</h3>
+              </div>
+              <strong class="session-r">0.00R</strong>
+            </div>
+
+            <div class="mini-grid">
+              <div>
+                <span>TRADES</span>
+                <strong class="session-trades">0</strong>
+              </div>
+
+              <div>
+                <span>WIN RATE</span>
+                <strong class="session-winrate">0%</strong>
+              </div>
+
+              <div>
+                <span>P&L</span>
+                <strong class="session-pnl">$0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-card" data-session="New York">
+            <div class="analysis-header">
+              <div>
+                <span>SESSION</span>
+                <h3>New York</h3>
+              </div>
+              <strong class="session-r">0.00R</strong>
+            </div>
+
+            <div class="mini-grid">
+              <div>
+                <span>TRADES</span>
+                <strong class="session-trades">0</strong>
+              </div>
+
+              <div>
+                <span>WIN RATE</span>
+                <strong class="session-winrate">0%</strong>
+              </div>
+
+              <div>
+                <span>P&L</span>
+                <strong class="session-pnl">$0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-card" data-session="Asian">
+            <div class="analysis-header">
+              <div>
+                <span>SESSION</span>
+                <h3>Asian</h3>
+              </div>
+              <strong class="session-r">0.00R</strong>
+            </div>
+
+            <div class="mini-grid">
+              <div>
+                <span>TRADES</span>
+                <strong class="session-trades">0</strong>
+              </div>
+
+              <div>
+                <span>WIN RATE</span>
+                <strong class="session-winrate">0%</strong>
+              </div>
+
+              <div>
+                <span>P&L</span>
+                <strong class="session-pnl">$0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-card" data-session="New York AM">
+            <div class="analysis-header">
+              <div>
+                <span>SESSION</span>
+                <h3>New York AM</h3>
+              </div>
+              <strong class="session-r">0.00R</strong>
+            </div>
+
+            <div class="mini-grid">
+              <div>
+                <span>TRADES</span>
+                <strong class="session-trades">0</strong>
+              </div>
+
+              <div>
+                <span>WIN RATE</span>
+                <strong class="session-winrate">0%</strong>
+              </div>
+
+              <div>
+                <span>P&L</span>
+                <strong class="session-pnl">$0</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETUP ANALYSIS -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">SETUP ANALYSIS</div>
+            <h2>Strategy Performance</h2>
+          </div>
+        </div>
+
+        <div id="setupContainer" class="setup-grid">
+          <div class="empty-state">
+            No setup data yet.
+          </div>
+        </div>
+      </section>
+
+      <!-- CONFLUENCE -->
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">LEX₈R SYSTEM</div>
+            <h2>Confluence Usage</h2>
+          </div>
+        </div>
+
+        <div class="confluence-grid">
+          <div class="confluence-card">
+            <span>LIQUIDITY SWEEP</span>
+            <strong id="liquiditySweep">0%</strong>
+          </div>
+
+          <div class="confluence-card">
+            <span>POI</span>
+            <strong id="poi">0%</strong>
+          </div>
+
+          <div class="confluence-card">
+            <span>MSS</span>
+            <strong id="mss">0%</strong>
+          </div>
+
+          <div class="confluence-card">
+            <span>DISPLACEMENT</span>
+            <strong id="displacement">0%</strong>
+          </div>
+
+          <div class="confluence-card">
+            <span>HTF ALIGNMENT</span>
+            <strong id="htfAlignment">0%</strong>
+          </div>
+
+          <div class="confluence-card">
+            <span>VOLUME CONFIRMATION</span>
+            <strong id="volumeConfirmation">0%</strong>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</Layout>
+
+<script>
+  import { loadTrades } from "../lib/tradeStore";
+  import {
+    calculateAnalytics,
+    getSessionAnalytics,
+    getSetupAnalytics
+  } from "../lib/analyticsEngine";
+  import {
+    getDailyPerformance
+  } from "../lib/dailyAnalyticsEngine";
+
+  function money(value: number): string {
+    const sign = value < 0 ? "-" : "";
+
+    return `${sign}$${Math.abs(value).toFixed(2)}`;
+  }
+
+  function signedR(value: number): string {
+    return `${value >= 0 ? "+" : ""}${value.toFixed(2)}R`;
+  }
+
+  function setText(id: string, value: string) {
+    const element = document.getElementById(id);
+
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  function escapeHtml(value: string): string {
+    return value
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  // ============================================================
+  // MAIN ANALYTICS
+  // ============================================================
+
+  function updateAnalytics() {
+    const trades = loadTrades();
+    const analytics = calculateAnalytics(trades);
+
+    setText(
+      "totalTrades",
+      analytics.totalTrades.toString()
+    );
+
+    setText(
+      "winRate",
+      `${analytics.winRate.toFixed(1)}%`
+    );
+
+    setText(
+      "netR",
+      signedR(analytics.netR)
+    );
+
+    setText(
+      "averageR",
+      signedR(analytics.averageR)
+    );
+
+    setText(
+      "profitFactor",
+      analytics.profitFactor === Infinity
+        ? "∞"
+        : analytics.profitFactor.toFixed(2)
+    );
+
+    setText(
+      "totalPnl",
+      money(analytics.totalPnL)
+    );
+
+    setText(
+      "winningTrades",
+      analytics.winningTrades.toString()
+    );
+
+    setText(
+      "losingTrades",
+      analytics.losingTrades.toString()
+    );
+
+    setText(
+      "breakevenTrades",
+      analytics.breakevenTrades.toString()
+    );
+
+    setText(
+      "averageWin",
+      signedR(analytics.averageWinR)
+    );
+
+    setText(
+      "averageLoss",
+      signedR(analytics.averageLossR)
+    );
+
+    setText(
+      "bestTrade",
+      signedR(analytics.bestTradeR)
+    );
+
+    setText(
+      "worstTrade",
+      signedR(analytics.worstTradeR)
+    );
+
+    setText(
+      "averagePnl",
+      money(analytics.averagePnL)
+    );
+
+    updateSessions();
+    updateSetups();
+    updateConfluence();
+    renderTradingCalendar();
+  }
+
+  // ============================================================
+  // SESSION ANALYSIS
+  // ============================================================
+
+  function updateSessions() {
+    document
+      .querySelectorAll<HTMLElement>("[data-session]")
+      .forEach((card) => {
+        const session = card.dataset.session ?? "";
+
+        const analytics =
+          getSessionAnalytics(session);
+
+        const r =
+          card.querySelector(".session-r");
+
+        const trades =
+          card.querySelector(".session-trades");
+
+        const winrate =
+          card.querySelector(".session-winrate");
+
+        const pnl =
+          card.querySelector(".session-pnl");
+
+        if (r) {
+          r.textContent = signedR(analytics.netR);
+        }
+
+        if (trades) {
+          trades.textContent =
+            analytics.totalTrades.toString();
+        }
+
+        if (winrate) {
+          winrate.textContent =
+            `${analytics.winRate.toFixed(1)}%`;
+        }
+
+        if (pnl) {
+          pnl.textContent =
+            money(analytics.totalPnL);
+        }
+      });
+  }
+
+  // ============================================================
+  // SETUP ANALYSIS
+  // ============================================================
+
+  function updateSetups() {
+    const trades = loadTrades();
+
+    const container =
+      document.querySelector("#setupContainer");
+
+    if (!container) return;
+
+    const setups = [
+      ...new Set(
+        trades
+          .map((trade) => trade.setup)
+          .filter(Boolean)
+      )
+    ];
+
+    if (!setups.length) {
+      container.innerHTML =
+        `<div class="empty-state">No setup data yet.</div>`;
+
+      return;
+    }
+
+    container.innerHTML = setups
+      .map((setup) => {
+        const analytics =
+          getSetupAnalytics(setup);
+
+        return `
+          <div class="setup-card">
+            <div class="setup-header">
+              <div>
+                <span>SETUP</span>
+                <h3>${escapeHtml(setup)}</h3>
+              </div>
+
+              <strong>
+                ${signedR(analytics.netR)}
+              </strong>
+            </div>
+
+            <div class="mini-grid">
+              <div>
+                <span>TRADES</span>
+                <strong>${analytics.totalTrades}</strong>
+              </div>
+
+              <div>
+                <span>WIN RATE</span>
+                <strong>${analytics.winRate.toFixed(1)}%</strong>
+              </div>
+
+              <div>
+                <span>P&L</span>
+                <strong>${money(analytics.totalPnL)}</strong>
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  // ============================================================
+  // CONFLUENCE USAGE
+  // ============================================================
+
+  function updateConfluence() {
+    const trades = loadTrades();
+
+    const keys = [
+      "liquiditySweep",
+      "poi",
+      "mss",
+      "displacement",
+      "htfAlignment",
+      "volumeConfirmation"
+    ] as const;
+
+    if (!trades.length) {
+      keys.forEach((key) => {
+        setText(key, "0%");
+      });
+
+      return;
+    }
+
+    keys.forEach((key) => {
+      const count = trades.filter(
+        (trade) => trade.confluence[key]
+      ).length;
+
+      const percentage =
+        (count / trades.length) * 100;
+
+      setText(
+        key,
+        `${percentage.toFixed(1)}%`
+      );
+    });
+  }
+
+  // ============================================================
+  // TRADING CALENDAR
+  // ============================================================
+
+  let calendarDate = new Date();
+
+  function getLatestTradeDate(): Date | null {
+    const daily = getDailyPerformance();
+
+    if (!daily.length) {
+      return null;
+    }
+
+    const sorted = [...daily].sort(
+      (a, b) =>
+        a.date.localeCompare(b.date)
+    );
+
+    const latest = sorted.at(-1);
+
+    if (!latest) return null;
+
+    const date =
+      new Date(`${latest.date}T00:00:00`);
+
+    return Number.isNaN(date.getTime())
+      ? null
+      : date;
+  }
+
+  function renderTradingCalendar() {
+    const calendar =
+      document.getElementById("tradingCalendar");
+
+    const details =
+      document.getElementById("dayDetails");
+
+    if (!calendar || !details) return;
+
+    const daily = getDailyPerformance();
+
+    if (!daily.length) {
+      calendar.innerHTML = `
+        <div class="calendar-empty">
+          No trading data available.
+        </div>
+      `;
+
+      details.innerHTML = `
+        <div class="empty-day">
+          Record your first trade to populate the calendar.
+        </div>
+      `;
+
+      return;
+    }
+
+    const latestTradeDate =
+      getLatestTradeDate();
+
+    if (latestTradeDate) {
+      const hasInitialMonth =
+        calendar.dataset.initialized === "true";
+
+      if (!hasInitialMonth) {
+        calendarDate =
+          new Date(
+            latestTradeDate.getFullYear(),
+            latestTradeDate.getMonth(),
+            1
+          );
+
+        calendar.dataset.initialized = "true";
+      }
+    }
+
+    const byDate = new Map(
+      daily.map((day) => [
+        day.date,
+        day
+      ])
+    );
+
+    const year =
+      calendarDate.getFullYear();
+
+    const month =
+      calendarDate.getMonth();
+
+    const firstDay =
+      new Date(year, month, 1);
+
+    const lastDay =
+      new Date(year, month + 1, 0);
+
+    const monthName =
+      calendarDate.toLocaleString(
+        "en-US",
+        { month: "long" }
+      );
+
+    const startOffset =
+      firstDay.getDay();
+
+    let html = `
+      <div class="calendar-header">
+        <button
+          id="previousMonth"
+          type="button"
+          aria-label="Previous month"
+        >
+          ‹
+        </button>
+
+        <div>
+          <strong>
+            ${monthName} ${year}
+          </strong>
+
+          <span>
+            ${daily.length}
+            trading day${daily.length === 1 ? "" : "s"} recorded
+          </span>
+        </div>
+
+        <button
+          id="nextMonth"
+          type="button"
+          aria-label="Next month"
+        >
+          ›
+        </button>
+      </div>
+
+      <div class="calendar-weekdays">
+        <span>Sun</span>
+        <span>Mon</span>
+        <span>Tue</span>
+        <span>Wed</span>
+        <span>Thu</span>
+        <span>Fri</span>
+        <span>Sat</span>
+      </div>
+
+      <div class="calendar-grid">
+    `;
+
+    for (
+      let i = 0;
+      i < startOffset;
+      i++
+    ) {
+      html += `
+        <div class="calendar-day blank"></div>
+      `;
+    }
+
+    for (
+      let dayNumber = 1;
+      dayNumber <= lastDay.getDate();
+      dayNumber++
+    ) {
+      const date =
+        `${year}-${String(month + 1).padStart(2, "0")}-${String(dayNumber).padStart(2, "0")}`;
+
+      const performance =
+        byDate.get(date);
+
+      let state = "empty";
+
+      if (performance) {
+        if (performance.pnl > 0) {
+          state = "profit";
+        } else if (performance.pnl < 0) {
+          state = "loss";
+        } else {
+          state = "flat";
+        }
+      }
+
+      html += `
+        <button
+          class="calendar-day ${state}"
+          data-date="${date}"
+          type="button"
+        >
+          <span class="day-number">
+            ${dayNumber}
+          </span>
+
+          ${
+            performance
+              ? `
+                <span class="day-trades">
+                  ${performance.trades}
+                  trade${performance.trades === 1 ? "" : "s"}
+                </span>
+
+                <span class="day-pnl">
+                  ${performance.pnl >= 0 ? "+" : ""}
+                  $${performance.pnl.toFixed(2)}
+                </span>
+              `
+              : ""
+          }
+        </button>
+      `;
+    }
+
+    html += `
+      </div>
+    `;
+
+    calendar.innerHTML = html;
+
+    const previous =
+      document.getElementById(
+        "previousMonth"
+      );
+
+    const next =
+      document.getElementById(
+        "nextMonth"
+      );
+
+    previous?.addEventListener(
+      "click",
+      () => {
+        calendarDate =
+          new Date(
+            year,
+            month - 1,
+            1
+          );
+
+        renderTradingCalendar();
+      }
+    );
+
+    next?.addEventListener(
+      "click",
+      () => {
+        calendarDate =
+          new Date(
+            year,
+            month + 1,
+            1
+          );
+
+        renderTradingCalendar();
+      }
+    );
+
+    calendar
+      .querySelectorAll<HTMLButtonElement>(
+        ".calendar-day[data-date]"
+      )
+      .forEach((button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            const date =
+              button.dataset.date;
+
+            if (!date) return;
+
+            const performance =
+              byDate.get(date);
+
+            if (!performance) return;
+
+            calendar
+              .querySelectorAll(
+                ".calendar-day.selected"
+              )
+              .forEach((element) =>
+                element.classList.remove(
+                  "selected"
+                )
+              );
+
+            button.classList.add("selected");
+
+            details.innerHTML = `
+              <div class="day-details-header">
+                <div>
+                  <div class="eyebrow">
+                    DAY PERFORMANCE
+                  </div>
+
+                  <h3>${date}</h3>
+                </div>
+
+                <strong
+                  class="${
+                    performance.pnl >= 0
+                      ? "positive"
+                      : "negative"
+                  }"
+                >
+                  ${
+                    performance.pnl >= 0
+                      ? "+"
+                      : ""
+                  }$${performance.pnl.toFixed(2)}
+                </strong>
+              </div>
+
+              <div class="day-metrics">
+                <div>
+                  <span>TRADES</span>
+                  <strong>
+                    ${performance.trades}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>WIN RATE</span>
+                  <strong>
+                    ${performance.winRate.toFixed(1)}%
+                  </strong>
+                </div>
+
+                <div>
+                  <span>NET R</span>
+                  <strong>
+                    ${
+                      performance.netR >= 0
+                        ? "+"
+                        : ""
+                    }${performance.netR.toFixed(2)}R
+                  </strong>
+                </div>
+
+                <div>
+                  <span>AVG R</span>
+                  <strong>
+                    ${
+                      performance.averageR >= 0
+                        ? "+"
+                        : ""
+                    }${performance.averageR.toFixed(2)}R
+                  </strong>
+                </div>
+
+                <div>
+                  <span>WINS</span>
+                  <strong>
+                    ${performance.wins}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>LOSSES</span>
+                  <strong>
+                    ${performance.losses}
+                  </strong>
+                </div>
+              </div>
+            `;
+          }
+        );
+      });
+  }
+
+  updateAnalytics();
+
+  window.addEventListener(
+    "storage",
+    (event) => {
+      if (
+        event.key === "lex8r_trades"
+      ) {
+        updateAnalytics();
+      }
+    }
+  );
+
+  window.addEventListener(
+    "focus",
+    updateAnalytics
+  );
+</script>
+
+<style>
+  :global(*) {
+    box-sizing: border-box;
+  }
+
+  :global(body) {
+    margin: 0;
+    background: #050505;
+    color: #f4f4f4;
+    font-family:
+      Inter,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+  }
+
+  .app-shell {
+    min-height: 100vh;
+    display: flex;
+    background:
+      radial-gradient(
+        circle at 80% 10%,
+        rgba(0, 140, 255, 0.08),
+        transparent 30%
+      ),
+      #050505;
+  }
+
+  .sidebar {
+    width: 240px;
+    min-height: 100vh;
+    border-right: 1px solid #1b1b1b;
+    background: #080808;
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #d6b35a;
+    display: grid;
+    place-items: center;
+    color: #d6b35a;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .brand-name {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .brand-sub {
+    margin-top: 3px;
+    color: #666;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+  }
+
+  nav {
+    display: grid;
+    gap: 7px;
+  }
+
+  .nav-link {
+    color: #777;
+    text-decoration: none;
+    padding: 12px 13px;
+    border: 1px solid transparent;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: #f4f4f4;
+    border-color: #242424;
+    background: #101010;
+  }
+
+  .nav-link.active {
+    color: #d6b35a;
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+  }
+
+  .system-status {
+    color: #777;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4bd37b;
+    box-shadow:
+      0 0 10px rgba(75, 211, 123, 0.6);
+  }
+
+  .version {
+    margin-top: 10px;
+    color: #444;
+    font-size: 9px;
+  }
+
+  .main {
+    flex: 1;
+    min-width: 0;
+    padding: 34px;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 36px;
+  }
+
+  .eyebrow {
+    color: #d6b35a;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+  }
+
+  h1 {
+    margin: 8px 0 4px;
+    font-size: clamp(30px, 4vw, 48px);
+    font-weight: 850;
+    letter-spacing: -0.055em;
+    line-height: 0.98;
+  }
+
+  h2 {
+    margin: 6px 0 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+  }
+
+  h3 {
+    margin: 7px 0 0;
+    font-weight: 750;
+    letter-spacing: -0.015em;
+  }
+
+  .topbar p,
+  .section-heading p {
+    margin: 5px 0 0;
+    color: #666;
+    font-size: 13px;
+  }
+
+  .btn {
+    color: #d6b35a;
+    text-decoration: none;
+    border: 1px solid #493d20;
+    background: #0c0b08;
+    padding: 11px 15px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+  }
+
+  .section {
+    margin-bottom: 42px;
+  }
+
+  .section-heading {
+    margin-bottom: 16px;
+  }
+
+  /* ============================================================
+     STATISTICS
+     ============================================================ */
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+  }
+
+  .stat-card,
+  .quality-card,
+  .confluence-card,
+  .analysis-card,
+  .setup-card {
+    border: 1px solid #1b1b1b;
+    background:
+      linear-gradient(
+        145deg,
+        #101010,
+        #090909
+      );
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+
+  .stat-card span,
+  .quality-card span,
+  .confluence-card span,
+  .analysis-card span,
+  .setup-card span,
+  .mini-grid span {
+    display: block;
+    color: #666;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .stat-card strong {
+    display: block;
+    margin-top: 12px;
+    font-size: 25px;
+    font-weight: 850;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+
+  /* ============================================================
+     CALENDAR
+     ============================================================ */
+
+  .calendar {
+    border: 1px solid #1b1b1b;
+    background: #090909;
+    padding: 20px;
+  }
+
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .calendar-header button {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #252525;
+    background: #0d0d0d;
+    color: #d6b35a;
+    font-size: 22px;
+    cursor: pointer;
+  }
+
+  .calendar-header button:hover {
+    background: #151515;
+    border-color: #493d20;
+  }
+
+  .calendar-header div {
+    text-align: center;
+  }
+
+  .calendar-header strong {
+    display: block;
+    font-size: 16px;
+  }
+
+  .calendar-header span {
+    display: block;
+    margin-top: 4px;
+    color: #666;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .calendar-weekdays,
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+  }
+
+  .calendar-weekdays {
+    margin-bottom: 5px;
+  }
+
+  .calendar-weekdays span {
+    padding: 8px 4px;
+    color: #555;
+    font-size: 9px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .calendar-day {
+    min-height: 82px;
+    padding: 9px;
+    border: 1px solid #171717;
+    background: #0b0b0b;
+    color: #aaa;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .calendar-day:hover {
+    border-color: #555;
+  }
+
+  .calendar-day.blank {
+    cursor: default;
+    background: #070707;
+  }
+
+  .calendar-day.profit {
+    border-color: rgba(50, 190, 110, 0.35);
+    background: rgba(50, 190, 110, 0.07);
+  }
+
+  .calendar-day.loss {
+    border-color: rgba(220, 70, 70, 0.35);
+    background: rgba(220, 70, 70, 0.07);
+  }
+
+  .calendar-day.flat {
+    border-color: #333;
+  }
+
+  .calendar-day.selected {
+    outline: 1px solid #d6b35a;
+  }
+
+  .day-number {
+    display: block;
+    color: #777;
+    font-size: 11px;
+  }
+
+  .day-trades {
+    display: block;
+    margin-top: 10px;
+    color: #777;
+    font-size: 9px;
+  }
+
+  .day-pnl {
+    display: block;
+    margin-top: 5px;
+    color: #d6b35a;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .calendar-empty,
+  .empty-day {
+    padding: 35px;
+    color: #555;
+    text-align: center;
+  }
+
+  .day-details {
+    margin-top: 15px;
+    border: 1px solid #1b1b1b;
+    background: #090909;
+    padding: 20px;
+  }
+
+  .day-details-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .day-details-header h3 {
+    margin: 6px 0 0;
+    font-size: 18px;
+  }
+
+  .day-details-header > strong {
+    font-size: 20px;
+  }
+
+  .day-metrics {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+
+  .day-metrics div {
+    padding: 13px;
+    border: 1px solid #151515;
+  }
+
+  .day-metrics span {
+    display: block;
+    color: #555;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+
+  .day-metrics strong {
+    display: block;
+    margin-top: 7px;
+    font-size: 14px;
+  }
+
+  .positive {
+    color: #55c98a;
+  }
+
+  .negative {
+    color: #e06b6b;
+  }
+
+  /* ============================================================
+     QUALITY
+     ============================================================ */
+
+  .quality-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .quality-card {
+    padding: 18px;
+  }
+
+  .quality-card strong {
+    display: block;
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+  }
+
+  /* ============================================================
+     SESSION ANALYSIS
+     ============================================================ */
+
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .analysis-card,
+  .setup-card {
+    padding: 18px;
+  }
+
+  .analysis-header,
+  .setup-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+  }
+
+  .analysis-header h3,
+  .setup-header h3 {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .analysis-header > strong,
+  .setup-header > strong {
+    color: #d6b35a;
+    font-size: 15px;
+    font-weight: 850;
+    letter-spacing: -0.02em;
+  }
+
+  .mini-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .mini-grid strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+  }
+
+  /* ============================================================
+     SETUPS
+     ============================================================ */
+
+  .setup-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  /* ============================================================
+     CONFLUENCE
+     ============================================================ */
+
+  .confluence-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .confluence-card {
+    padding: 20px;
+  }
+
+  .confluence-card strong {
+    display: block;
+    margin-top: 12px;
+    color: #d6b35a;
+    font-size: 24px;
+    font-weight: 850;
+    letter-spacing: -0.035em;
+  }
+
+  .empty-state {
+    grid-column: 1 / -1;
+    border: 1px dashed #242424;
+    padding: 35px;
+    text-align: center;
+    color: #555;
+    font-size: 12px;
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+
+  @media (max-width: 1200px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .analysis-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .quality-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .sidebar {
+      display: none;
+    }
+
+    .main {
+      padding: 22px;
+    }
+
+    .quality-grid,
+    .confluence-grid,
+    .setup-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .day-metrics {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .main {
+      padding: 16px;
+    }
+
+    .topbar {
+      flex-direction: column;
+    }
+
+    .stats-grid,
+    .quality-grid,
+    .analysis-grid,
+    .confluence-grid,
+    .setup-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .calendar {
+      padding: 10px;
+    }
+
+    .calendar-day {
+      min-height: 65px;
+      padding: 5px;
+    }
+
+    .day-trades {
+      display: none;
+    }
+
+    .day-pnl {
+      font-size: 9px;
+    }
+
+    .day-metrics {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

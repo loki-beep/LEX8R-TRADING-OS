@@ -1,0 +1,456 @@
+---
+---
+
+<div class="chart-card">
+  <div class="chart-header">
+    <div>
+      <div class="eyebrow">EQUITY CURVE</div>
+      <h3>Performance Timeline</h3>
+    </div>
+
+    <div class="chart-stats">
+      <div>
+        <span>PEAK</span>
+        <strong id="chartPeak">$0.00</strong>
+      </div>
+
+      <div>
+        <span>MAX DD</span>
+        <strong id="chartDrawdown">$0.00</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-wrap">
+    <svg
+      id="equityChart"
+      viewBox="0 0 1000 360"
+      preserveAspectRatio="none"
+      role="img"
+      aria-label="Trading equity curve"
+    >
+      <defs>
+        <linearGradient
+          id="equityGradient"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
+          <stop offset="0%" stop-opacity="0.22" />
+          <stop offset="100%" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+
+      <g id="gridLines"></g>
+      <path id="equityArea"></path>
+      <path id="equityLine"></path>
+      <g id="equityPoints"></g>
+    </svg>
+
+    <div id="chartEmpty" class="chart-empty">
+      No trade data yet.
+    </div>
+  </div>
+
+  <div class="chart-footer">
+    <div>
+      <span>START</span>
+      <strong id="chartStart">$0.00</strong>
+    </div>
+
+    <div>
+      <span>CURRENT</span>
+      <strong id="chartCurrent">$0.00</strong>
+    </div>
+
+    <div>
+      <span>NET</span>
+      <strong id="chartNet">$0.00</strong>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { loadTrades } from "../lib/tradeStore";
+
+  interface Point {
+    equity: number;
+    date: string;
+    pnl: number;
+  }
+
+  function money(value: number): string {
+    const sign = value < 0 ? "-" : "";
+
+    return `${sign}$${Math.abs(value).toFixed(2)}`;
+  }
+
+  function buildPoints(): Point[] {
+    const trades = loadTrades()
+      .filter((trade) => Number.isFinite(Number(trade.pnl)))
+      .sort((a, b) =>
+        a.createdAt.localeCompare(b.createdAt)
+      );
+
+    if (!trades.length) return [];
+
+    let equity = 0;
+
+    return trades.map((trade) => {
+      const pnl = Number(trade.pnl || 0);
+
+      equity += pnl;
+
+      return {
+        equity,
+        date: trade.date,
+        pnl
+      };
+    });
+  }
+
+  function drawChart() {
+    const svg =
+      document.querySelector("#equityChart") as SVGSVGElement | null;
+
+    const line =
+      document.querySelector("#equityLine") as SVGPathElement | null;
+
+    const area =
+      document.querySelector("#equityArea") as SVGPathElement | null;
+
+    const pointsGroup =
+      document.querySelector("#equityPoints") as SVGGElement | null;
+
+    const grid =
+      document.querySelector("#gridLines") as SVGGElement | null;
+
+    const empty =
+      document.querySelector("#chartEmpty") as HTMLElement | null;
+
+    if (!svg || !line || !area || !pointsGroup || !grid) return;
+
+    const points = buildPoints();
+
+    if (!points.length) {
+      empty?.classList.add("visible");
+      line.setAttribute("d", "");
+      area.setAttribute("d", "");
+      pointsGroup.innerHTML = "";
+      grid.innerHTML = "";
+      return;
+    }
+
+    empty?.classList.remove("visible");
+
+    const width = 1000;
+    const height = 360;
+
+    const paddingX = 35;
+    const paddingY = 30;
+
+    const chartWidth = width - paddingX * 2;
+    const chartHeight = height - paddingY * 2;
+
+    const values = points.map(
+      (point) => point.equity
+    );
+
+    const minValue = Math.min(
+      0,
+      ...values
+    );
+
+    const maxValue = Math.max(
+      0,
+      ...values
+    );
+
+    const range =
+      maxValue - minValue || 1;
+
+    const getX = (index: number) => {
+      if (points.length === 1) {
+        return width / 2;
+      }
+
+      return (
+        paddingX +
+        (index / (points.length - 1)) *
+          chartWidth
+      );
+    };
+
+    const getY = (value: number) =>
+      paddingY +
+      ((maxValue - value) / range) *
+        chartHeight;
+
+    const coordinates = points.map(
+      (point, index) => ({
+        x: getX(index),
+        y: getY(point.equity)
+      })
+    );
+
+    const path = coordinates
+      .map((point, index) =>
+        `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`
+      )
+      .join(" ");
+
+    line.setAttribute("d", path);
+
+    const areaPath =
+      `${path} L ${coordinates.at(-1)!.x} ${height - paddingY} ` +
+      `L ${coordinates[0].x} ${height - paddingY} Z`;
+
+    area.setAttribute("d", areaPath);
+
+    pointsGroup.innerHTML = coordinates
+      .map(
+        (point, index) => `
+          <circle
+            cx="${point.x}"
+            cy="${point.y}"
+            r="${index === coordinates.length - 1 ? 4 : 2.5}"
+          >
+            <title>
+              ${points[index].date} — ${money(points[index].equity)}
+            </title>
+          </circle>
+        `
+      )
+      .join("");
+
+    const gridValues = [
+      maxValue,
+      minValue + range * 0.75,
+      minValue + range * 0.5,
+      minValue + range * 0.25,
+      minValue
+    ];
+
+    grid.innerHTML = gridValues
+      .map((value) => {
+        const y = getY(value);
+
+        return `
+          <line
+            x1="${paddingX}"
+            y1="${y}"
+            x2="${width - paddingX}"
+            y2="${y}"
+          />
+
+          <text
+            x="${paddingX + 5}"
+            y="${y - 6}"
+          >
+            ${money(value)}
+          </text>
+        `;
+      })
+      .join("");
+
+    const peak =
+      Math.max(...values);
+
+    let runningPeak = 0;
+    let maxDrawdown = 0;
+
+    values.forEach((value) => {
+      runningPeak = Math.max(
+        runningPeak,
+        value
+      );
+
+      const drawdown =
+        runningPeak - value;
+
+      maxDrawdown = Math.max(
+        maxDrawdown,
+        drawdown
+      );
+    });
+
+    const start = 0;
+    const current = values.at(-1) ?? 0;
+    const net = current - start;
+
+    setText("chartPeak", money(peak));
+    setText("chartDrawdown", money(maxDrawdown));
+    setText("chartStart", money(start));
+    setText("chartCurrent", money(current));
+    setText("chartNet", money(net));
+  }
+
+  function setText(
+    id: string,
+    value: string
+  ) {
+    const element =
+      document.getElementById(id);
+
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  drawChart();
+
+  window.addEventListener(
+    "storage",
+    (event) => {
+      if (event.key === "lex8r_trades") {
+        drawChart();
+      }
+    }
+  );
+
+  window.addEventListener(
+    "focus",
+    drawChart
+  );
+</script>
+
+<style>
+  .chart-card {
+    border: 1px solid #1b1b1b;
+    background:
+      linear-gradient(
+        145deg,
+        rgba(214, 179, 90, 0.035),
+        transparent 35%
+      ),
+      #090909;
+    padding: 22px;
+  }
+
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .eyebrow {
+    color: #d6b35a;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+  }
+
+  .chart-header h3 {
+    margin: 7px 0 0;
+    font-size: 18px;
+  }
+
+  .chart-stats {
+    display: flex;
+    gap: 24px;
+  }
+
+  .chart-stats span,
+  .chart-footer span {
+    display: block;
+    color: #666;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .chart-stats strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+  }
+
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 360px;
+    border: 1px solid #141414;
+    background: #070707;
+    overflow: hidden;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  #gridLines line {
+    stroke: #181818;
+    stroke-width: 1;
+  }
+
+  #gridLines text {
+    fill: #4d4d4d;
+    font-size: 10px;
+  }
+
+  #equityLine {
+    fill: none;
+    stroke: #d6b35a;
+    stroke-width: 3;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  #equityArea {
+    fill: url(#equityGradient);
+  }
+
+  #equityPoints circle {
+    fill: #d6b35a;
+    stroke: #050505;
+    stroke-width: 2;
+  }
+
+  .chart-empty {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    color: #555;
+    font-size: 12px;
+  }
+
+  .chart-empty.visible {
+    display: grid;
+  }
+
+  .chart-footer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .chart-footer div {
+    padding: 13px;
+    border: 1px solid #151515;
+  }
+
+  .chart-footer strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 14px;
+  }
+
+  @media (max-width: 650px) {
+    .chart-header {
+      flex-direction: column;
+    }
+
+    .chart-stats {
+      justify-content: space-between;
+    }
+
+    .chart-wrap {
+      height: 280px;
+    }
+  }
+</style>

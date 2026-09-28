@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6f7f9;
+  --foreground: #111318;
+  --card: #ffffff;
+  --card-foreground: #111318;
+  --secondary: #eef0f3;
+  --secondary-foreground: #20242b;
+  --border: #dfe3e8;
+  --muted-foreground: #68717d;
+  --primary: #c79b35;
+  --primary-foreground: #090a0c;
+  --destructive: #dc2626;
+  --chart-1: #2563eb;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #05070b;
+  --foreground: #f4f6f8;
+  --card: #0b0f15;
+  --card-foreground: #f4f6f8;
+  --secondary: #111722;
+  --secondary-foreground: #f4f6f8;
+  --border: #202733;
+  --muted-foreground: #8c96a5;
+  --primary: #d5aa3f;
+  --primary-foreground: #07080a;
+  --destructive: #ef4444;
+  --chart-1: #4f8cff;
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+* {
+  border-color: var(--border);
+}
+
+.bg-background {
+  background-color: var(--background);
+}
+
+.bg-card {
+  background-color: var(--card);
+}
+
+.bg-secondary {
+  background-color: var(--secondary);
+}
+
+.text-foreground {
+  color: var(--foreground);
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.text-primary-foreground {
+  color: var(--primary-foreground);
+}
+
+.text-muted-foreground {
+  color: var(--muted-foreground);
+}
+
+.border-border {
+  border-color: var(--border);
+}
+
+.bg-primary {
+  background-color: var(--primary);
+}
+
+.bg-destructive {
+  background-color: var(--destructive);
+}
+
+.text-destructive {
+  color: var(--destructive);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 35%, transparent);
+}
