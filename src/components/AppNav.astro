@@ -1,0 +1,46 @@
+---
+const currentPath = Astro.url.pathname;
+
+const links = [
+  { href: "/", label: "Dashboard", icon: "▣" },
+  { href: "/portfolio", label: "Portfolio", icon: "◈" },
+  { href: "/journal", label: "Journal", icon: "✎" },
+  { href: "/calendar", label: "Calendar", icon: "□" },
+  { href: "/analytics", label: "Analytics", icon: "⌁" },
+  { href: "/risk", label: "Risk", icon: "△" },
+  { href: "/settings", label: "Settings", icon: "⚙" },
+];
+
+const isActive = (href: string) => {
+  if (href === "/") return currentPath === "/";
+  return currentPath.startsWith(href);
+};
+---
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">8</div>
+
+    <div>
+      <div class="brand-name">LEX₈R</div>
+      <div class="brand-subtitle">TRADING OS</div>
+    </div>
+  </div>
+
+  <nav>
+    {links.map((link) => (
+      <a
+        href={link.href}
+        class:list={["nav-item", { active: isActive(link.href) }]}
+      >
+        <span>{link.icon}</span>
+        {link.label}
+      </a>
+    ))}
+  </nav>
+
+  <div class="system-status">
+    <span class="status-dot"></span>
+    SYSTEM ONLINE
+  </div>
+</aside>

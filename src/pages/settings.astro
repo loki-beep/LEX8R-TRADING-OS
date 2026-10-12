@@ -1,0 +1,1128 @@
+---
+import Layout from "../layouts/Layout.astro";
+import AppNav from "../components/AppNav.astro";
+
+const profile = {
+  name: "LEX₈R Trader",
+  username: "@lex8r",
+  email: "Account email",
+  plan: "LEX₈R Core",
+  memberSince: "2026",
+};
+
+const sections = [
+  { id: "profile", icon: "◉", label: "Profile" },
+  { id: "accounts", icon: "▣", label: "Trading Accounts" },
+  { id: "preferences", icon: "⚙", label: "Preferences" },
+  { id: "notifications", icon: "◌", label: "Notifications" },
+  { id: "integrations", icon: "↔", label: "Integrations" },
+  { id: "privacy", icon: "◇", label: "Data & Privacy" },
+  { id: "system", icon: "⌘", label: "LEX₈R System" },
+];
+---
+
+<Layout title="Settings — LEX₈R Trading OS">
+
+  <div class="app-shell">
+    <AppNav />
+
+    <main class="settings-shell">
+
+    <section class="settings-hero">
+      <div>
+        <div class="eyebrow">LEX₈R ACCOUNT PORTAL</div>
+        <h1>Settings</h1>
+        <p>
+          Control your identity, trading environment, integrations,
+          preferences and LEX₈R workspace.
+        </p>
+      </div>
+
+      <div class="profile-chip">
+        <div class="avatar">L8</div>
+        <div>
+          <strong>{profile.name}</strong>
+          <span>{profile.username}</span>
+        </div>
+        <span class="status-dot"></span>
+      </div>
+    </section>
+
+    <section class="portal-grid">
+
+      <aside class="settings-nav">
+        <div class="nav-label">ACCOUNT PORTAL</div>
+
+        {sections.map((section, index) => (
+          <button
+            class:list={["settings-tab", index === 0 && "active"]}
+            data-section={section.id}
+          >
+            <span class="tab-icon">{section.icon}</span>
+            <span>{section.label}</span>
+          </button>
+        ))}
+
+        <div class="portal-status">
+          <span class="pulse"></span>
+          <div>
+            <strong>LEX₈R ONLINE</strong>
+            <small>Workspace operational</small>
+          </div>
+        </div>
+      </aside>
+
+      <section class="settings-content">
+
+        <!-- PROFILE -->
+        <div class="settings-panel active" data-panel="profile">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">IDENTITY</span>
+              <h2>Trader Profile</h2>
+              <p>Your LEX₈R identity and public-facing trader information.</p>
+            </div>
+            <span class="panel-badge">PROFILE</span>
+          </div>
+
+          <div class="profile-card">
+            <div class="large-avatar">L8</div>
+
+            <div class="profile-main">
+              <h3>{profile.name}</h3>
+              <p>{profile.username}</p>
+
+              <div class="profile-meta">
+                <span>Member since {profile.memberSince}</span>
+                <span>•</span>
+                <span>{profile.plan}</span>
+              </div>
+            </div>
+
+            <button class="secondary-btn" type="button">Edit profile</button>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              <span>Display name</span>
+              <input value={profile.name} />
+            </label>
+
+            <label>
+              <span>Username</span>
+              <input value={profile.username.replace("@", "")} />
+            </label>
+
+            <label>
+              <span>Email</span>
+              <input value={profile.email} />
+            </label>
+
+            <label>
+              <span>Trader bio</span>
+              <input placeholder="Add a short trading profile..." />
+            </label>
+          </div>
+
+          <div class="public-profile">
+            <div>
+              <strong>Public trader profile</strong>
+              <p>Allow selected performance information to appear on your future LEX₈R public profile.</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" />
+              <span></span>
+            </label>
+          </div>
+
+          <button class="primary-btn save-btn" type="button">Save profile</button>
+        </div>
+
+        <!-- ACCOUNTS -->
+        <div class="settings-panel" data-panel="accounts">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">CAPITAL STRUCTURE</span>
+              <h2>Trading Accounts</h2>
+              <p>Manage the accounts connected to your LEX₈R workspace.</p>
+            </div>
+            <button class="primary-btn" type="button">+ Add account</button>
+          </div>
+
+          <div class="account-list">
+
+            <article class="account-row">
+              <div class="account-symbol prop">M</div>
+              <div class="account-info">
+                <strong>Maven $2K</strong>
+                <span>Maven Trading · Prop</span>
+              </div>
+              <div class="account-stat">
+                <small>Balance</small>
+                <strong>$2,084.20</strong>
+              </div>
+              <div class="account-stat positive">
+                <small>P&L</small>
+                <strong>+$84.20</strong>
+              </div>
+              <span class="account-state">ACTIVE</span>
+              <button class="icon-btn" type="button">•••</button>
+            </article>
+
+            <article class="account-row">
+              <div class="account-symbol personal">P</div>
+              <div class="account-info">
+                <strong>Personal $1K</strong>
+                <span>Personal · Personal</span>
+              </div>
+              <div class="account-stat">
+                <small>Balance</small>
+                <strong>$1,126.40</strong>
+              </div>
+              <div class="account-stat positive">
+                <small>P&L</small>
+                <strong>+$126.40</strong>
+              </div>
+              <span class="account-state">ACTIVE</span>
+              <button class="icon-btn" type="button">•••</button>
+            </article>
+
+            <article class="account-row">
+              <div class="account-symbol eval">E</div>
+              <div class="account-info">
+                <strong>Evaluation $5K</strong>
+                <span>Prop Firm · Evaluation</span>
+              </div>
+              <div class="account-stat">
+                <small>Balance</small>
+                <strong>$4,967.90</strong>
+              </div>
+              <div class="account-stat negative">
+                <small>P&L</small>
+                <strong>−$32.10</strong>
+              </div>
+              <span class="account-state warning">EVALUATION</span>
+              <button class="icon-btn" type="button">•••</button>
+            </article>
+
+          </div>
+
+          <div class="info-box">
+            <span>i</span>
+            <div>
+              <strong>Account ownership</strong>
+              <p>Every trading account will belong to a specific LEX₈R user. This is the foundation for the future multi-user database.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PREFERENCES -->
+        <div class="settings-panel" data-panel="preferences">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">WORKSPACE</span>
+              <h2>Preferences</h2>
+              <p>Configure how LEX₈R presents and interprets your trading data.</p>
+            </div>
+          </div>
+
+          <div class="preference-list">
+            <div class="preference-row">
+              <div>
+                <strong>Interface theme</strong>
+                <p>LEX₈R terminal theme</p>
+              </div>
+              <select>
+                <option>LEX₈R Dark</option>
+                <option>System</option>
+              </select>
+            </div>
+
+            <div class="preference-row">
+              <div>
+                <strong>Base currency</strong>
+                <p>Default currency for portfolio calculations</p>
+              </div>
+              <select>
+                <option>USD — US Dollar</option>
+                <option>KES — Kenyan Shilling</option>
+                <option>EUR — Euro</option>
+                <option>GBP — British Pound</option>
+              </select>
+            </div>
+
+            <div class="preference-row">
+              <div>
+                <strong>Timezone</strong>
+                <p>Used for sessions, calendar and daily risk calculations</p>
+              </div>
+              <select>
+                <option>UTC+03:00 — East Africa Time</option>
+                <option>UTC</option>
+                <option>UTC+01:00</option>
+                <option>UTC-05:00</option>
+              </select>
+            </div>
+
+            <div class="preference-row">
+              <div>
+                <strong>Default instrument</strong>
+                <p>Instrument shown when creating a new trade</p>
+              </div>
+              <select>
+                <option>XAUUSD</option>
+                <option>EURUSD</option>
+                <option>GBPUSD</option>
+              </select>
+            </div>
+
+            <div class="preference-row">
+              <div>
+                <strong>Default trading session</strong>
+                <p>Used by the journal and analytics engine</p>
+              </div>
+              <select>
+                <option>London</option>
+                <option>New York</option>
+                <option>Asian</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTIFICATIONS -->
+        <div class="settings-panel" data-panel="notifications">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">ALERT ENGINE</span>
+              <h2>Notifications</h2>
+              <p>Choose which LEX₈R events deserve your attention.</p>
+            </div>
+          </div>
+
+          <div class="toggle-list">
+            <div class="toggle-row">
+              <div>
+                <strong>Risk threshold alerts</strong>
+                <p>Notify when account risk approaches configured limits.</p>
+              </div>
+              <label class="switch"><input type="checkbox" checked /><span></span></label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <strong>Daily loss alerts</strong>
+                <p>Notify when daily P&L approaches the account loss limit.</p>
+              </div>
+              <label class="switch"><input type="checkbox" checked /><span></span></label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <strong>Drawdown alerts</strong>
+                <p>Monitor account drawdown against configured limits.</p>
+              </div>
+              <label class="switch"><input type="checkbox" checked /><span></span></label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <strong>Product updates</strong>
+                <p>Receive information about new LEX₈R capabilities.</p>
+              </div>
+              <label class="switch"><input type="checkbox" checked /><span></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- INTEGRATIONS -->
+        <div class="settings-panel" data-panel="integrations">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">CONNECTIVITY</span>
+              <h2>Integrations</h2>
+              <p>Connect LEX₈R to the trading tools that power your workflow.</p>
+            </div>
+          </div>
+
+          <div class="integration-grid">
+
+            <article class="integration-card">
+              <div class="integration-icon mt5">MT5</div>
+              <div>
+                <strong>MetaTrader 5</strong>
+                <p>Automatic trade and account synchronization.</p>
+              </div>
+              <span class="coming">COMING SOON</span>
+            </article>
+
+            <article class="integration-card">
+              <div class="integration-icon tv">TV</div>
+              <div>
+                <strong>TradingView</strong>
+                <p>Chart context and trading workflow integration.</p>
+              </div>
+              <span class="coming">PLANNED</span>
+            </article>
+
+            <article class="integration-card">
+              <div class="integration-icon api">API</div>
+              <div>
+                <strong>LEX₈R API</strong>
+                <p>Programmatic access to your future trading workspace.</p>
+              </div>
+              <span class="coming">PLANNED</span>
+            </article>
+
+          </div>
+
+          <div class="info-box">
+            <span>↗</span>
+            <div>
+              <strong>Integration architecture</strong>
+              <p>Integrations will be attached to individual users and accounts rather than being global application settings.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRIVACY -->
+        <div class="settings-panel" data-panel="privacy">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">CONTROL</span>
+              <h2>Data & Privacy</h2>
+              <p>Control the data stored inside your LEX₈R workspace.</p>
+            </div>
+          </div>
+
+          <div class="privacy-card">
+            <div>
+              <strong>Your trading data belongs to your workspace.</strong>
+              <p>
+                The future multi-user architecture will isolate accounts,
+                trades, analytics and integrations by user identity.
+              </p>
+            </div>
+            <span class="privacy-mark">PRIVATE</span>
+          </div>
+
+          <div class="data-actions">
+            <button class="secondary-btn" type="button">Export trading data</button>
+            <button class="secondary-btn" type="button">Download analytics</button>
+            <button class="danger-btn" type="button">Delete account</button>
+          </div>
+        </div>
+
+        <!-- SYSTEM -->
+        <div class="settings-panel" data-panel="system">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">SYSTEM CORE</span>
+              <h2>LEX₈R System</h2>
+              <p>Application status and platform information.</p>
+            </div>
+            <span class="panel-badge live">OPERATIONAL</span>
+          </div>
+
+          <div class="system-grid">
+            <div>
+              <small>APPLICATION</small>
+              <strong>LEX₈R Trading OS</strong>
+            </div>
+
+            <div>
+              <small>ARCHITECTURE</small>
+              <strong>Astro</strong>
+            </div>
+
+            <div>
+              <small>TRADING ENGINE</small>
+              <strong>LEX₈R Core</strong>
+            </div>
+
+            <div>
+              <small>VERSION</small>
+              <strong>v1.0</strong>
+            </div>
+          </div>
+
+          <div class="roadmap">
+            <div class="roadmap-title">PLATFORM ROADMAP</div>
+
+            <div class="roadmap-item complete">
+              <span>✓</span>
+              <div>
+                <strong>Trading OS</strong>
+                <small>Journal · Portfolio · Calendar · Analytics · Risk</small>
+              </div>
+            </div>
+
+            <div class="roadmap-item active-roadmap">
+              <span>◆</span>
+              <div>
+                <strong>Account Portal</strong>
+                <small>Profile · Preferences · Integrations · User workspace</small>
+              </div>
+            </div>
+
+            <div class="roadmap-item">
+              <span>○</span>
+              <div>
+                <strong>Multi-user infrastructure</strong>
+                <small>Authentication · Database · User isolation</small>
+              </div>
+            </div>
+
+            <div class="roadmap-item">
+              <span>○</span>
+              <div>
+                <strong>LEX₈R Intelligence</strong>
+                <small>Pattern discovery · behavioural analytics · adaptive insights</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </section>
+
+  </main>
+  </div>
+
+</Layout>
+
+<style>
+  :global(body) {
+    background:
+      radial-gradient(circle at 80% 0%, rgba(212, 175, 55, 0.055), transparent 32%),
+      #07090d;
+  }
+
+  .settings-shell {
+    max-width: 1450px;
+    margin: 0 auto;
+    padding: 28px 30px 60px;
+    color: #eef2f7;
+  }
+
+  .settings-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    padding: 10px 0 28px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+  }
+
+  .eyebrow,
+  .panel-kicker,
+  .nav-label,
+  .roadmap-title {
+    color: #d4af37;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .18em;
+  }
+
+  h1 {
+    margin: 7px 0 5px;
+    font-size: clamp(30px, 4vw, 44px);
+    letter-spacing: -.035em;
+  }
+
+  .settings-hero p {
+    margin: 0;
+    color: #8993a3;
+    max-width: 680px;
+  }
+
+  .profile-chip {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 13px 9px 9px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 13px;
+    background: rgba(255,255,255,.025);
+    min-width: 190px;
+  }
+
+  .avatar,
+  .large-avatar {
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #d4af37, #8f6d13);
+    color: #08090b;
+    font-weight: 950;
+  }
+
+  .avatar { width: 36px; height: 36px; font-size: 12px; }
+  .large-avatar { width: 70px; height: 70px; font-size: 21px; border-radius: 18px; }
+
+  .profile-chip strong,
+  .profile-chip span {
+    display: block;
+  }
+
+  .profile-chip strong { font-size: 12px; }
+  .profile-chip span { color: #77808f; font-size: 10px; margin-top: 2px; }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    margin-left: auto;
+    border-radius: 50%;
+    background: #49d17d;
+    box-shadow: 0 0 10px rgba(73,209,125,.65);
+  }
+
+  .portal-grid {
+    display: grid;
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 22px;
+    margin-top: 22px;
+  }
+
+  .settings-nav {
+    align-self: start;
+    position: sticky;
+    top: 20px;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 16px;
+    background: rgba(13,16,22,.82);
+  }
+
+  .nav-label {
+    padding: 10px 11px 13px;
+    color: #667080;
+  }
+
+  .settings-tab {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #8993a3;
+    cursor: pointer;
+    text-align: left;
+    font-size: 12px;
+    transition: .18s ease;
+  }
+
+  .settings-tab:hover {
+    color: #e9edf4;
+    background: rgba(255,255,255,.035);
+  }
+
+  .settings-tab.active {
+    color: #f3d86c;
+    background: linear-gradient(90deg, rgba(212,175,55,.13), rgba(212,175,55,.035));
+    box-shadow: inset 2px 0 #d4af37;
+  }
+
+  .tab-icon {
+    width: 18px;
+    text-align: center;
+    color: #677283;
+  }
+
+  .active .tab-icon { color: #d4af37; }
+
+  .portal-status {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 17px 5px 3px;
+    padding: 12px 9px;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+
+  .portal-status strong,
+  .portal-status small {
+    display: block;
+  }
+
+  .portal-status strong { font-size: 9px; color: #d5dbe5; }
+  .portal-status small { margin-top: 3px; font-size: 8px; color: #687283; }
+
+  .pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #49d17d;
+    box-shadow: 0 0 10px rgba(73,209,125,.65);
+  }
+
+  .settings-content {
+    min-width: 0;
+  }
+
+  .settings-panel {
+    display: none;
+    padding: 24px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 16px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.025), rgba(255,255,255,.008)),
+      #0b0e13;
+  }
+
+  .settings-panel.active { display: block; }
+
+  .panel-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 23px;
+  }
+
+  .panel-heading h2 {
+    margin: 5px 0 5px;
+    font-size: 22px;
+    letter-spacing: -.025em;
+  }
+
+  .panel-heading p {
+    margin: 0;
+    color: #788292;
+    font-size: 12px;
+  }
+
+  .panel-badge,
+  .account-state,
+  .coming,
+  .privacy-mark {
+    padding: 5px 8px;
+    border-radius: 5px;
+    background: rgba(212,175,55,.09);
+    border: 1px solid rgba(212,175,55,.2);
+    color: #d4af37;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    white-space: nowrap;
+  }
+
+  .panel-badge.live {
+    color: #55d68a;
+    background: rgba(85,214,138,.07);
+    border-color: rgba(85,214,138,.2);
+  }
+
+  .profile-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 13px;
+    background: rgba(255,255,255,.018);
+  }
+
+  .profile-main { flex: 1; }
+  .profile-main h3 { margin: 0 0 4px; font-size: 16px; }
+  .profile-main p { margin: 0; color: #7f8999; font-size: 11px; }
+
+  .profile-meta {
+    display: flex;
+    gap: 8px;
+    margin-top: 9px;
+    color: #5f6978;
+    font-size: 9px;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  .primary-btn,
+  .secondary-btn,
+  .danger-btn,
+  .icon-btn {
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 750;
+  }
+
+  .primary-btn {
+    padding: 9px 13px;
+    border: 1px solid rgba(212,175,55,.4);
+    background: #d4af37;
+    color: #08090b;
+  }
+
+  .secondary-btn {
+    padding: 9px 13px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.025);
+    color: #ccd3dd;
+  }
+
+  .danger-btn {
+    padding: 9px 13px;
+    border: 1px solid rgba(239,90,90,.25);
+    background: rgba(239,90,90,.06);
+    color: #ef7f7f;
+  }
+
+  .save-btn { margin-top: 18px; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+  }
+
+  label > span {
+    display: block;
+    margin-bottom: 7px;
+    color: #7d8796;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  input,
+  select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+    outline: none;
+    background: #080b10;
+    color: #dce2eb;
+    font: inherit;
+    font-size: 11px;
+  }
+
+  input:focus,
+  select:focus {
+    border-color: rgba(212,175,55,.45);
+  }
+
+  .public-profile,
+  .toggle-row,
+  .preference-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,.055);
+  }
+
+  .public-profile { margin-top: 20px; }
+  .public-profile strong,
+  .toggle-row strong,
+  .preference-row strong { font-size: 11px; }
+
+  .public-profile p,
+  .toggle-row p,
+  .preference-row p {
+    margin: 4px 0 0;
+    color: #687282;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .switch {
+    flex: 0 0 auto;
+  }
+
+  .switch input {
+    display: none;
+  }
+
+  .switch span {
+    display: block;
+    width: 37px;
+    height: 21px;
+    border-radius: 30px;
+    background: #222832;
+    border: 1px solid rgba(255,255,255,.08);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .switch span::after {
+    content: "";
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    top: 2px;
+    left: 2px;
+    border-radius: 50%;
+    background: #77808d;
+    transition: .18s ease;
+  }
+
+  .switch input:checked + span {
+    background: rgba(212,175,55,.2);
+    border-color: rgba(212,175,55,.45);
+  }
+
+  .switch input:checked + span::after {
+    left: 18px;
+    background: #d4af37;
+  }
+
+  .account-list {
+    display: grid;
+    gap: 9px;
+  }
+
+  .account-row {
+    display: grid;
+    grid-template-columns: 38px minmax(130px, 1fr) 100px 90px auto 30px;
+    align-items: center;
+    gap: 12px;
+    padding: 13px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 11px;
+    background: rgba(255,255,255,.015);
+  }
+
+  .account-symbol {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .account-symbol.prop { background: rgba(212,175,55,.12); color: #d4af37; }
+  .account-symbol.personal { background: rgba(58,151,255,.11); color: #63adff; }
+  .account-symbol.eval { background: rgba(174,104,255,.11); color: #b984ff; }
+
+  .account-info strong,
+  .account-info span,
+  .account-stat strong,
+  .account-stat small {
+    display: block;
+  }
+
+  .account-info strong { font-size: 11px; }
+  .account-info span,
+  .account-stat small { color: #657080; font-size: 8px; margin-top: 3px; }
+  .account-stat strong { font-size: 10px; }
+
+  .positive strong { color: #58d78a; }
+  .negative strong { color: #ee7474; }
+
+  .account-state {
+    color: #59d58a;
+    background: rgba(89,213,138,.06);
+    border-color: rgba(89,213,138,.17);
+  }
+
+  .account-state.warning {
+    color: #d4af37;
+    background: rgba(212,175,55,.07);
+    border-color: rgba(212,175,55,.18);
+  }
+
+  .icon-btn {
+    border: 0;
+    background: transparent;
+    color: #5e6877;
+  }
+
+  .info-box {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+    padding: 13px;
+    border: 1px solid rgba(58,151,255,.12);
+    border-radius: 10px;
+    background: rgba(58,151,255,.035);
+  }
+
+  .info-box > span {
+    display: grid;
+    place-items: center;
+    width: 21px;
+    height: 21px;
+    flex: 0 0 21px;
+    border-radius: 50%;
+    background: rgba(58,151,255,.12);
+    color: #63adff;
+    font-size: 9px;
+  }
+
+  .info-box strong { font-size: 10px; }
+  .info-box p { margin: 4px 0 0; color: #6e7b8d; font-size: 9px; line-height: 1.5; }
+
+  .preference-list,
+  .toggle-list {
+    border-top: 1px solid rgba(255,255,255,.055);
+  }
+
+  .preference-row select {
+    max-width: 230px;
+  }
+
+  .integration-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 12px;
+  }
+
+  .integration-card {
+    min-height: 150px;
+    padding: 17px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 12px;
+    background: rgba(255,255,255,.015);
+  }
+
+  .integration-icon {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 18px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .integration-icon.mt5 { background: rgba(212,175,55,.12); color: #d4af37; }
+  .integration-icon.tv { background: rgba(73,209,125,.1); color: #63d68d; }
+  .integration-icon.api { background: rgba(99,173,255,.1); color: #63adff; }
+
+  .integration-card strong { font-size: 11px; }
+  .integration-card p { color: #687383; font-size: 9px; line-height: 1.5; margin: 5px 0 14px; }
+  .integration-card .coming { align-self: flex-start; margin-top: auto; color: #77808e; background: rgba(255,255,255,.025); border-color: rgba(255,255,255,.08); }
+
+  .privacy-card {
+    padding: 18px;
+    border: 1px solid rgba(212,175,55,.14);
+    border-radius: 12px;
+    background: rgba(212,175,55,.035);
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .privacy-card strong { font-size: 12px; }
+  .privacy-card p { color: #747f8f; font-size: 10px; line-height: 1.6; max-width: 650px; }
+  .privacy-mark { align-self: flex-start; }
+
+  .data-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 18px;
+  }
+
+  .system-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .system-grid > div {
+    padding: 15px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 10px;
+    background: rgba(255,255,255,.015);
+  }
+
+  .system-grid small,
+  .system-grid strong {
+    display: block;
+  }
+
+  .system-grid small { color: #606a79; font-size: 8px; letter-spacing: .08em; }
+  .system-grid strong { margin-top: 6px; font-size: 10px; }
+
+  .roadmap {
+    margin-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.055);
+    padding-top: 18px;
+  }
+
+  .roadmap-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 13px 0;
+    border-bottom: 1px solid rgba(255,255,255,.045);
+  }
+
+  .roadmap-item > span {
+    width: 22px;
+    text-align: center;
+    color: #505968;
+  }
+
+  .roadmap-item.complete > span { color: #55d68a; }
+  .roadmap-item.active-roadmap > span { color: #d4af37; }
+
+  .roadmap-item strong,
+  .roadmap-item small {
+    display: block;
+  }
+
+  .roadmap-item strong { font-size: 10px; }
+  .roadmap-item small { margin-top: 3px; color: #697383; font-size: 9px; }
+
+  @media (max-width: 900px) {
+    .portal-grid { grid-template-columns: 1fr; }
+    .settings-nav { position: static; display: flex; overflow-x: auto; gap: 4px; }
+    .nav-label, .portal-status { display: none; }
+    .settings-tab { min-width: max-content; }
+    .integration-grid { grid-template-columns: 1fr; }
+    .system-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 650px) {
+    .settings-shell { padding: 18px 14px 40px; }
+    .settings-hero { align-items: flex-start; flex-direction: column; }
+    .profile-chip { width: 100%; box-sizing: border-box; }
+    .settings-panel { padding: 17px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .account-row { grid-template-columns: 38px 1fr auto; }
+    .account-stat, .account-state, .account-row .icon-btn { display: none; }
+    .system-grid { grid-template-columns: 1fr 1fr; }
+    .preference-row { align-items: flex-start; flex-direction: column; }
+    .preference-row select { max-width: none; }
+  }
+</style>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>(".settings-tab"));
+  const panels = Array.from(document.querySelectorAll<HTMLElement>(".settings-panel"));
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const target = tab.dataset.section;
+      if (!target) return;
+
+      tabs.forEach((item) => item.classList.remove("active"));
+      panels.forEach((panel) => panel.classList.remove("active"));
+
+      tab.classList.add("active");
+
+      const panel = document.querySelector<HTMLElement>(
+        `[data-panel="${target}"]`
+      );
+
+      panel?.classList.add("active");
+    });
+  });
+</script>

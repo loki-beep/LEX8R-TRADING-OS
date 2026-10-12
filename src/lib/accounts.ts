@@ -9,6 +9,7 @@ export type AccountStatus =
   | "FAILED";
 
 export interface TradingAccount {
+  userId: string;
   id: string;
   name: string;
   firm: string;
@@ -35,6 +36,7 @@ export interface TradingAccount {
 
 export const accounts: TradingAccount[] = [
   {
+    userId: "dev-user-001",
     id: "maven-2k",
     name: "Maven $2K",
     firm: "Maven Trading",
@@ -60,6 +62,7 @@ export const accounts: TradingAccount[] = [
   },
 
   {
+    userId: "dev-user-001",
     id: "personal-1k",
     name: "Personal $1K",
     firm: "Personal",
@@ -85,6 +88,7 @@ export const accounts: TradingAccount[] = [
   },
 
   {
+    userId: "dev-user-001",
     id: "evaluation-5k",
     name: "Evaluation $5K",
     firm: "Prop Firm",

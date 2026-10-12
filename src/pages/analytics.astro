@@ -1,34 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import AppNav from "../components/AppNav.astro";
 import EquityChart from "../components/EquityChart.astro";
 ---
 
 <Layout title="LEX₈R Analytics">
   <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">8</div>
-        <div>
-          <div class="brand-name">LEX₈R</div>
-          <div class="brand-sub">TRADING OS</div>
-        </div>
-      </div>
-
-      <nav>
-        <a href="/" class="nav-link">Dashboard</a>
-        <a href="/portfolio" class="nav-link">Portfolio</a>
-        <a href="/journal" class="nav-link">Journal</a>
-        <a href="/analytics" class="nav-link active">Analytics</a>
-      </nav>
-
-      <div class="sidebar-bottom">
-        <div class="system-status">
-          <span class="status-dot"></span>
-          SYSTEM ONLINE
-        </div>
-        <div class="version">LEX₈R OS v1.0</div>
-      </div>
-    </aside>
+    <AppNav />
 
     <main class="main">
       <header class="topbar">
@@ -343,7 +321,7 @@ import EquityChart from "../components/EquityChart.astro";
 </Layout>
 
 <script>
-  import { loadTrades } from "../lib/tradeStore";
+  import { getCurrentUserTrades } from "../lib/tradeRepository";
   import {
     calculateAnalytics,
     getSessionAnalytics,
@@ -385,7 +363,7 @@ import EquityChart from "../components/EquityChart.astro";
   // ============================================================
 
   function updateAnalytics() {
-    const trades = loadTrades();
+    const trades = getCurrentUserTrades();
     const analytics = calculateAnalytics(trades);
 
     setText(
@@ -517,7 +495,7 @@ import EquityChart from "../components/EquityChart.astro";
   // ============================================================
 
   function updateSetups() {
-    const trades = loadTrades();
+    const trades = getCurrentUserTrades();
 
     const container =
       document.querySelector("#setupContainer");
@@ -584,7 +562,7 @@ import EquityChart from "../components/EquityChart.astro";
   // ============================================================
 
   function updateConfluence() {
-    const trades = loadTrades();
+    const trades = getCurrentUserTrades();
 
     const keys = [
       "liquiditySweep",

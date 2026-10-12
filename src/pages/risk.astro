@@ -1,8 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import AppNav from "../components/AppNav.astro";
 ---
 
 <Layout title="Risk Center">
+  <div class="app-shell">
+    <AppNav />
   <main class="risk-page">
 
     <header class="page-header">
@@ -166,13 +169,16 @@ import Layout from "../layouts/Layout.astro";
 
     <script>
   import {
-    accounts,
     resolveAccountId
   } from "../lib/accounts";
 
   import {
-    loadTrades
-  } from "../lib/tradeStore";
+    getCurrentUserAccounts
+  } from "../lib/accountRepository";
+
+  import {
+    getCurrentUserTrades
+  } from "../lib/tradeRepository";
 
   import {
     calculateAnalytics
@@ -182,13 +188,15 @@ import Layout from "../layouts/Layout.astro";
     calculateRiskAmount
   } from "../lib/accountEngine";
 
-  const accountSelect =
-    document.querySelector("#accountSelect");
+  const accounts = getCurrentUserAccounts();
 
-  const money = (value) =>
+  const accountSelect =
+    document.querySelector<HTMLSelectElement>("#accountSelect");
+
+  const money = (value: number) =>
     `${value < 0 ? "-" : ""}$${Math.abs(value).toFixed(2)}`;
 
-  const signedMoney = (value) =>
+  const signedMoney = (value: number) =>
     `${value >= 0 ? "+" : "-"}$${Math.abs(value).toFixed(2)}`;
 
   function updateRisk() {
@@ -202,7 +210,7 @@ import Layout from "../layouts/Layout.astro";
 
     if (!account) return;
 
-    const trades = loadTrades();
+    const trades = getCurrentUserTrades();
 
     const accountTrades =
       trades.filter(
@@ -221,13 +229,6 @@ import Layout from "../layouts/Layout.astro";
       calculateRiskAmount(
         account.id,
         account.riskPerTrade
-      );
-
-    const dailyLoss =
-      Math.max(
-        -account.dailyLossLimit -
-          Math.min(analytics.totalPnL, 0),
-        0
       );
 
     const drawdown =
@@ -271,19 +272,19 @@ import Layout from "../layouts/Layout.astro";
           )
         : 0;
 
-    document.querySelector("#equity").textContent =
+    document.querySelector<HTMLElement>("#equity")!.textContent =
       money(equity);
 
-    document.querySelector("#equityChange").textContent =
+    document.querySelector<HTMLElement>("#equityChange")!.textContent =
       signedMoney(analytics.totalPnL);
 
-    document.querySelector("#riskPercent").textContent =
+    document.querySelector<HTMLElement>("#riskPercent")!.textContent =
       `${account.riskPerTrade.toFixed(2)}%`;
 
-    document.querySelector("#riskAmount").textContent =
+    document.querySelector<HTMLElement>("#riskAmount")!.textContent =
       money(riskAmount);
 
-    document.querySelector("#dailyRemaining").textContent =
+    document.querySelector<HTMLElement>("#dailyRemaining")!.textContent =
       money(
         Math.max(
           account.dailyLossLimit - dailyUsed,
@@ -291,7 +292,7 @@ import Layout from "../layouts/Layout.astro";
         )
       );
 
-    document.querySelector("#drawdownRemaining").textContent =
+    document.querySelector<HTMLElement>("#drawdownRemaining")!.textContent =
       money(
         Math.max(
           account.maxDrawdown - drawdownUsed,
@@ -299,58 +300,58 @@ import Layout from "../layouts/Layout.astro";
         )
       );
 
-    document.querySelector("#dailyProgress").style.width =
+    document.querySelector<HTMLElement>("#dailyProgress")!.style.width =
       `${dailyPercent}%`;
 
-    document.querySelector("#drawdownProgress").style.width =
+    document.querySelector<HTMLElement>("#drawdownProgress")!.style.width =
       `${drawdownPercent}%`;
 
-    document.querySelector("#dailyLimitLabel").textContent =
+    document.querySelector<HTMLElement>("#dailyLimitLabel")!.textContent =
       `${money(dailyUsed)} / ${money(account.dailyLossLimit)}`;
 
-    document.querySelector("#dailyLimitValue").textContent =
+    document.querySelector<HTMLElement>("#dailyLimitValue")!.textContent =
       `${dailyPercent.toFixed(1)}%`;
 
-    document.querySelector("#dailyLimitBar").style.width =
+    document.querySelector<HTMLElement>("#dailyLimitBar")!.style.width =
       `${dailyPercent}%`;
 
-    document.querySelector("#maxDrawdownLabel").textContent =
+    document.querySelector<HTMLElement>("#maxDrawdownLabel")!.textContent =
       `${money(drawdownUsed)} / ${money(account.maxDrawdown)}`;
 
-    document.querySelector("#maxDrawdownValue").textContent =
+    document.querySelector<HTMLElement>("#maxDrawdownValue")!.textContent =
       `${drawdownPercent.toFixed(1)}%`;
 
-    document.querySelector("#maxDrawdownBar").style.width =
+    document.querySelector<HTMLElement>("#maxDrawdownBar")!.style.width =
       `${drawdownPercent}%`;
 
-    document.querySelector("#targetLabel").textContent =
+    document.querySelector<HTMLElement>("#targetLabel")!.textContent =
       `${money(Math.max(analytics.totalPnL, 0))} / ${money(account.profitTarget)}`;
 
-    document.querySelector("#targetValue").textContent =
+    document.querySelector<HTMLElement>("#targetValue")!.textContent =
       account.profitTarget > 0
         ? `${targetPercent.toFixed(1)}%`
         : "N/A";
 
-    document.querySelector("#targetBar").style.width =
+    document.querySelector<HTMLElement>("#targetBar")!.style.width =
       `${targetPercent}%`;
 
-    document.querySelector("#controlRisk").textContent =
+    document.querySelector<HTMLElement>("#controlRisk")!.textContent =
       `${account.riskPerTrade.toFixed(2)}%`;
 
-    document.querySelector("#controlAmount").textContent =
+    document.querySelector<HTMLElement>("#controlAmount")!.textContent =
       money(riskAmount);
 
-    document.querySelector("#oneR").textContent =
+    document.querySelector<HTMLElement>("#oneR")!.textContent =
       money(riskAmount);
 
-    document.querySelector("#twoR").textContent =
+    document.querySelector<HTMLElement>("#twoR")!.textContent =
       money(riskAmount * 2);
 
-    document.querySelector("#threeR").textContent =
+    document.querySelector<HTMLElement>("#threeR")!.textContent =
       money(riskAmount * 3);
 
     const status =
-      document.querySelector("#overallStatus");
+      document.querySelector<HTMLElement>("#overallStatus")!;
 
     const highestUsage =
       Math.max(
@@ -372,7 +373,7 @@ import Layout from "../layouts/Layout.astro";
     }
 
     const overview =
-      document.querySelector("#accountOverview");
+      document.querySelector<HTMLElement>("#accountOverview")!;
 
     overview.innerHTML = "";
 
@@ -438,6 +439,7 @@ import Layout from "../layouts/Layout.astro";
 </script>
 
   </main>
+  </div>
 </Layout>
 
 <style>

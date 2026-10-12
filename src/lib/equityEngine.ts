@@ -1,8 +1,8 @@
-import { accounts } from "./accounts";
-import { loadTrades } from "./tradeStore";
+import { getUserAccount } from "./accountRepository";
+import { getCurrentUserTrades } from "./tradeRepository";
 
 export function getAccountTrades(accountId: string) {
-  return loadTrades().filter(
+  return getCurrentUserTrades().filter(
     (trade) => trade.accountId === accountId
   );
 }
@@ -15,9 +15,7 @@ export function getAccountPnL(accountId: string) {
 }
 
 export function getAccountEquity(accountId: string) {
-  const account = accounts.find(
-    (account) => account.id === accountId
-  );
+  const account = getUserAccount(accountId);
 
   if (!account) return 0;
 
@@ -25,9 +23,7 @@ export function getAccountEquity(accountId: string) {
 }
 
 export function getAccountDrawdown(accountId: string) {
-  const account = accounts.find(
-    (account) => account.id === accountId
-  );
+  const account = getUserAccount(accountId);
 
   if (!account) return 0;
 
@@ -40,9 +36,7 @@ export function getAccountDrawdown(accountId: string) {
 }
 
 export function getAccountDrawdownPercent(accountId: string) {
-  const account = accounts.find(
-    (account) => account.id === accountId
-  );
+  const account = getUserAccount(accountId);
 
   if (!account || account.startingBalance <= 0) return 0;
 

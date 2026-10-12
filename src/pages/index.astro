@@ -1,5 +1,9 @@
 ---
-import { accounts } from "../lib/accounts";
+import "../styles/global.css";
+import AppNav from "../components/AppNav.astro";
+import { getCurrentUserAccounts } from "../lib/accountRepository";
+
+const accounts = getCurrentUserAccounts();
 ---
 
 <html lang="en">
@@ -14,75 +18,9 @@ import { accounts } from "../lib/accounts";
   </head>
 
   <body>
-    <div class="app">
+    <div class="app app-shell">
 
-      <aside class="sidebar">
-        <div class="brand">
-          <div class="brand-mark">L8</div>
-          <div>
-            <div class="brand-name">LEX8R</div>
-            <div class="brand-subtitle">TRADING OS</div>
-          </div>
-        </div>
-
-        <nav>
-          <div class="nav-section">WORKSPACE</div>
-
-          <a class="nav-item active" href="/">
-            <span>◈</span>
-            Dashboard
-          </a>
-
-          <a class="nav-item" href="/portfolio">
-            <span>▣</span>
-            Portfolio
-          </a>
-
-          <a class="nav-item" href="/journal">
-            <span>↗</span>
-            Journal
-          </a>
-
-          <a class="nav-item" href="/calendar">
-            <span>▦</span>
-            Calendar
-          </a>
-
-          <div class="nav-section">ANALYSIS</div>
-
-          <a class="nav-item" href="/analytics">
-            <span>⌁</span>
-            Performance
-          </a>
-
-          <a class="nav-item" href="/risk">
-            <span>◒</span>
-            Risk
-          </a>
-
-          <a class="nav-item" href="#">
-            <span>◫</span>
-            Sessions
-          </a>
-
-          <a class="nav-item" href="#">
-            <span>◇</span>
-            LEX8R System
-          </a>
-
-          <div class="nav-section">ACCOUNT</div>
-
-          <a class="nav-item" href="#">
-            <span>⚙</span>
-            Settings
-          </a>
-        </nav>
-
-        <div class="system-status">
-          <span class="status-dot"></span>
-          SYSTEM ONLINE
-        </div>
-      </aside>
+      <AppNav />
 
       <main class="main">
 
@@ -1008,17 +946,25 @@ import { accounts } from "../lib/accounts";
     </style>
 
     <script>
-      import { loadTrades } from "../lib/tradeStore";
-      import { accounts, resolveAccountId } from "../lib/accounts";
+      import { getCurrentUserTrades } from "../lib/tradeRepository";
+      import {
+        getCurrentUserAccounts
+      } from "../lib/accountRepository";
+
+      import {
+        resolveAccountId
+      } from "../lib/accounts";
+
+      const accounts = getCurrentUserAccounts();
       import { calculateAnalytics } from "../lib/analyticsEngine";
 
-      const money = (value) =>
+      const money = (value: number) =>
         `${value < 0 ? "-" : ""}$${Math.abs(value).toFixed(2)}`;
 
-      const signedMoney = (value) =>
+      const signedMoney = (value: number) =>
         `${value >= 0 ? "+" : "-"}$${Math.abs(value).toFixed(2)}`;
 
-      const signedR = (value) =>
+      const signedR = (value: number) =>
         `${value >= 0 ? "+" : ""}${value.toFixed(2)}R`;
 
       function localDateKey(date = new Date()) {
@@ -1030,7 +976,7 @@ import { accounts } from "../lib/accounts";
       }
 
       function updateDashboard() {
-        const trades = loadTrades();
+        const trades = getCurrentUserTrades();
 
         const analytics = calculateAnalytics(trades);
 

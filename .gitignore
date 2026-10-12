@@ -26,3 +26,4 @@ pnpm-debug.log*
 # local development backups
 *.before-*
 *.save
+.env.local

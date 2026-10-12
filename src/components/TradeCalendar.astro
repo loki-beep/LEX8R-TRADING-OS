@@ -83,36 +83,36 @@ const {} = Astro.props;
 </div>
 
 <script>
-  import { loadTrades } from "../lib/tradeStore";
-  const calendarMonth = document.querySelector("#calendar-month");
-  const calendarGrid = document.querySelector("#calendar-grid");
+  import { getCurrentUserTrades } from "../lib/tradeRepository";
+  const calendarMonth = document.querySelector<HTMLElement>("#calendar-month")!;
+  const calendarGrid = document.querySelector<HTMLElement>("#calendar-grid")!;
 
-  const todayBtn = document.querySelector("#today-btn");
-  const prevBtn = document.querySelector("#prev-month");
-  const nextBtn = document.querySelector("#next-month");
+  const todayBtn = document.querySelector<HTMLButtonElement>("#today-btn")!;
+  const prevBtn = document.querySelector<HTMLButtonElement>("#prev-month")!;
+  const nextBtn = document.querySelector<HTMLButtonElement>("#next-month")!;
 
-  const statPnl = document.querySelector("#stat-pnl");
-  const statWinrate = document.querySelector("#stat-winrate");
-  const statTrades = document.querySelector("#stat-trades");
-  const statR = document.querySelector("#stat-r");
-  const statBest = document.querySelector("#stat-best");
+  const statPnl = document.querySelector<HTMLElement>("#stat-pnl")!;
+  const statWinrate = document.querySelector<HTMLElement>("#stat-winrate")!;
+  const statTrades = document.querySelector<HTMLElement>("#stat-trades")!;
+  const statR = document.querySelector<HTMLElement>("#stat-r")!;
+  const statBest = document.querySelector<HTMLElement>("#stat-best")!;
 
-  const selectedDay = document.querySelector("#selected-day");
+  const selectedDay = document.querySelector<HTMLElement>("#selected-day")!;
 
   let currentDate = new Date(2026, 8, 28);
   let selectedDate = "2026-09-28";
 
-  const allTrades = loadTrades();
+  const allTrades = getCurrentUserTrades();
 
-  function pad(value) {
+  function pad(value: number) {
     return String(value).padStart(2, "0");
   }
 
-  function dateKey(year, month, day) {
+  function dateKey(year: number, month: number, day: number) {
     return `${year}-${pad(month + 1)}-${pad(day)}`;
   }
 
-  function formatMoney(value) {
+  function formatMoney(value: number) {
     const amount = Math.abs(value).toLocaleString("en-US", {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
@@ -123,13 +123,13 @@ const {} = Astro.props;
     return "$0";
   }
 
-  function formatR(value) {
+  function formatR(value: number) {
     if (value > 0) return `+${value.toFixed(1)}R`;
     if (value < 0) return `${value.toFixed(1)}R`;
     return "0R";
   }
 
-  function getTradesForDate(key) {
+  function getTradesForDate(key: string) {
     return allTrades.filter((trade) => trade.date === key);
   }
 
@@ -168,7 +168,7 @@ const {} = Astro.props;
         ? (wins / monthTrades.length) * 100
         : 0;
 
-    const dailyPnL = {};
+    const dailyPnL: Record<string, number> = {};
 
     monthTrades.forEach((trade) => {
       dailyPnL[trade.date] =
@@ -189,7 +189,7 @@ const {} = Astro.props;
           : "";
 
     statWinrate.textContent = `${winRate.toFixed(1)}%`;
-    statTrades.textContent = monthTrades.length;
+    statTrades.textContent = String(monthTrades.length);
     statR.textContent = formatR(netR);
 
     statR.className =
@@ -280,7 +280,7 @@ const {} = Astro.props;
 
       const dateNumber = document.createElement("span");
       dateNumber.className = "date-number";
-      dateNumber.textContent = day;
+      dateNumber.textContent = String(day);
 
       top.appendChild(dateNumber);
 

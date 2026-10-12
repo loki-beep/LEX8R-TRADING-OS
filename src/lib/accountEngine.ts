@@ -1,18 +1,13 @@
 import {
-  accounts,
-  resolveAccountId
-} from "./accounts";
+  getUserAccount
+} from "./accountRepository";
 
 import type { TradingAccount } from "./accounts";
 
 export function getAccount(
   accountId: string
 ): TradingAccount | undefined {
-  const resolvedId = resolveAccountId(accountId);
-
-  return accounts.find(
-    (account) => account.id === resolvedId
-  );
+  return getUserAccount(accountId);
 }
 
 export function calculateRiskAmount(

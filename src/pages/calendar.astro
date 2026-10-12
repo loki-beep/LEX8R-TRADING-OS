@@ -1,8 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import AppNav from "../components/AppNav.astro";
 import TradeCalendar from "../components/TradeCalendar.astro";
 ---
 
 <Layout title="Trading Calendar">
+  <div class="app-shell">
+    <AppNav />
   <TradeCalendar />
+  </div>
 </Layout>

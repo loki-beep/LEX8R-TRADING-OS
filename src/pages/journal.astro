@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import AppNav from "../components/AppNav.astro";
 import {
   trades,
   getNetR,
@@ -21,6 +22,8 @@ const stats = [
 ---
 
 <Layout title="LEX8R Journal">
+  <div class="app-shell">
+    <AppNav />
   <main class="journal">
 
     <header class="topbar">
@@ -272,7 +275,7 @@ nano src/pages/journal.astro          </label>
   </main>
 
  <script>
-  import { addTrade } from "../lib/tradeStore";
+  import { addUserTrade } from "../lib/tradeRepository";
   import { calculateTradePnL } from "../lib/accountEngine";
   import type { TradeStatus } from "../lib/trades";
 
@@ -322,6 +325,7 @@ nano src/pages/journal.astro          </label>
 );
 
     const trade = {
+      userId: "dev-user-001",
       id: `LEX-${Date.now()}`,
 
       date: getInput("date").value ||
@@ -386,7 +390,7 @@ nano src/pages/journal.astro          </label>
       createdAt: new Date().toISOString(),
     };
 
-    addTrade(trade);
+    addUserTrade(trade);
 
     alert("Trade successfully logged.");
 
@@ -704,4 +708,5 @@ nano src/pages/journal.astro          </label>
     }
 
   </style>
+  </div>
 </Layout>

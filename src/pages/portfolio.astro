@@ -1,33 +1,14 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { accounts, resolveAccountId } from "../lib/accounts";
+import AppNav from "../components/AppNav.astro";
+import { getCurrentUserAccounts } from "../lib/accountRepository";
+
+const accounts = getCurrentUserAccounts();
 ---
 
 <Layout title="LEX₈R Portfolio">
   <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">8</div>
-        <div>
-          <div class="brand-name">LEX₈R</div>
-          <div class="brand-sub">TRADING OS</div>
-        </div>
-      </div>
-
-      <nav>
-        <a href="/" class="nav-link">Dashboard</a>
-        <a href="/portfolio" class="nav-link active">Portfolio</a>
-        <a href="/journal" class="nav-link">Journal</a>
-      </nav>
-
-      <div class="sidebar-bottom">
-        <div class="system-status">
-          <span class="status-dot"></span>
-          SYSTEM ONLINE
-        </div>
-        <div class="version">LEX₈R OS v1.0</div>
-      </div>
-    </aside>
+    <AppNav />
 
     <main class="main">
       <header class="topbar">
@@ -171,8 +152,11 @@ import { accounts, resolveAccountId } from "../lib/accounts";
 </Layout>
 
 <script>
-  import { accounts, resolveAccountId } from "../lib/accounts";
-  import { loadTrades } from "../lib/tradeStore";
+  import { getCurrentUserAccounts } from "../lib/accountRepository";
+  import { resolveAccountId } from "../lib/accounts";
+
+  const accounts = getCurrentUserAccounts();
+  import { getCurrentUserTrades } from "../lib/tradeRepository";
   import {
     calculateAnalytics
   } from "../lib/analyticsEngine";
@@ -192,7 +176,7 @@ import { accounts, resolveAccountId } from "../lib/accounts";
   }
 
   function updatePortfolio() {
-    const trades = loadTrades();
+    const trades = getCurrentUserTrades();
 
     let totalPnl = 0;
     let totalR = 0;

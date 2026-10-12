@@ -1,4 +1,4 @@
-import { loadTrades } from "./tradeStore";
+import { getCurrentUserTrades } from "./tradeRepository";
 
 export interface DailyPerformance {
   date: string;
@@ -14,7 +14,7 @@ export interface DailyPerformance {
 }
 
 export function getDailyPerformance(): DailyPerformance[] {
-  const trades = loadTrades();
+  const trades = getCurrentUserTrades();
 
   const grouped = new Map<string, typeof trades>();
 

@@ -72,7 +72,7 @@
 </div>
 
 <script>
-  import { loadTrades } from "../lib/tradeStore";
+  import { getCurrentUserTrades } from "../lib/tradeRepository";
 
   interface Point {
     equity: number;
@@ -87,7 +87,7 @@
   }
 
   function buildPoints(): Point[] {
-    const trades = loadTrades()
+    const trades = getCurrentUserTrades()
       .filter((trade) => Number.isFinite(Number(trade.pnl)))
       .sort((a, b) =>
         a.createdAt.localeCompare(b.createdAt)

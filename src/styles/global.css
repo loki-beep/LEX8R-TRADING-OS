@@ -91,3 +91,281 @@ body {
 ::selection {
   background: color-mix(in srgb, var(--primary) 35%, transparent);
 }
+
+/* ============================================================
+   LEX₈R SHARED NAVIGATION
+   Preserves the original Dashboard navigation language.
+   ============================================================ */
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  background:
+    radial-gradient(circle at 70% -20%, rgba(40,123,255,.08), transparent 30%),
+    #050506;
+}
+
+.app-shell > .sidebar {
+  width: 240px;
+  min-height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  box-sizing: border-box;
+  padding: 28px 16px;
+  border-right: 1px solid #1a1a1e;
+  background: rgba(8,8,10,.96);
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell > .sidebar .brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 10px 32px;
+}
+
+.app-shell > .sidebar .brand-mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d4af37;
+  color: #d4af37;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.app-shell > .sidebar .brand-name {
+  font-weight: 800;
+  letter-spacing: 3px;
+  font-size: 15px;
+}
+
+.app-shell > .sidebar .brand-subtitle {
+  color: #77777e;
+  font-size: 8px;
+  letter-spacing: 2px;
+  margin-top: 3px;
+}
+
+.app-shell > .sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.app-shell > .sidebar .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  color: #85858d;
+  text-decoration: none;
+  font-size: 12px;
+  border: 1px solid transparent;
+  transition: .15s ease;
+}
+
+.app-shell > .sidebar .nav-item span {
+  width: 16px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.app-shell > .sidebar .nav-item:hover {
+  color: #ddd;
+  background: #111114;
+}
+
+.app-shell > .sidebar .nav-item.active {
+  color: #e8e8e8;
+  background: linear-gradient(
+    90deg,
+    rgba(212,175,55,.10),
+    rgba(212,175,55,.025)
+  );
+  border-color: rgba(212,175,55,.18);
+}
+
+.app-shell > .sidebar .nav-item.active span {
+  color: #d4af37;
+}
+
+.app-shell > .sidebar .system-status {
+  margin-top: auto;
+  padding: 12px;
+  color: #626269;
+  font-size: 9px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.app-shell > .sidebar .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38d996;
+  box-shadow: 0 0 10px rgba(56,217,150,.7);
+  display: inline-block;
+}
+
+@media (max-width: 1100px) {
+  .app-shell > .sidebar {
+    width: 200px;
+  }
+}
+
+@media (max-width: 850px) {
+  .app-shell > .sidebar {
+    display: none;
+  }
+}
+
+/* ============================================================
+   LEX₈R SHARED NAVIGATION
+   ============================================================ */
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  background:
+    radial-gradient(circle at 70% -20%, rgba(40,123,255,.08), transparent 30%),
+    #050506;
+}
+
+.app-shell > .sidebar {
+  width: 240px;
+  min-height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1000;
+  box-sizing: border-box;
+  padding: 28px 16px;
+  border-right: 1px solid #1a1a1e;
+  background: rgba(8,8,10,.96);
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell > .sidebar .brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 10px 32px;
+}
+
+.app-shell > .sidebar .brand-mark {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d4af37;
+  color: #d4af37;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.app-shell > .sidebar .brand-name {
+  color: #e8e8e8;
+  font-weight: 800;
+  letter-spacing: 3px;
+  font-size: 15px;
+}
+
+.app-shell > .sidebar .brand-subtitle {
+  color: #77777e;
+  font-size: 8px;
+  letter-spacing: 2px;
+  margin-top: 3px;
+}
+
+.app-shell > .sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.app-shell > .sidebar .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  color: #85858d;
+  text-decoration: none;
+  font-size: 12px;
+  border: 1px solid transparent;
+  transition: .15s ease;
+}
+
+.app-shell > .sidebar .nav-item span {
+  width: 16px;
+  flex: 0 0 16px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.app-shell > .sidebar .nav-item:hover {
+  color: #ddd;
+  background: #111114;
+}
+
+.app-shell > .sidebar .nav-item.active {
+  color: #e8e8e8;
+  background: linear-gradient(
+    90deg,
+    rgba(212,175,55,.10),
+    rgba(212,175,55,.025)
+  );
+  border-color: rgba(212,175,55,.18);
+}
+
+.app-shell > .sidebar .nav-item.active span {
+  color: #d4af37;
+}
+
+.app-shell > .sidebar .system-status {
+  margin-top: auto;
+  padding: 12px;
+  color: #626269;
+  font-size: 9px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.app-shell > .sidebar .status-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: #38d996;
+  box-shadow: 0 0 10px rgba(56,217,150,.7);
+  display: inline-block;
+}
+
+@media (max-width: 1100px) {
+  .app-shell > .sidebar {
+    width: 200px;
+  }
+}
+
+@media (max-width: 850px) {
+  .app-shell > .sidebar {
+    display: none;
+  }
+}

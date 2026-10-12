@@ -2,6 +2,7 @@ export type TradeDirection = "LONG" | "SHORT";
 export type TradeStatus = "WIN" | "LOSS" | "BREAKEVEN";
 
 export interface Trade {
+  userId: string;
   id: string;
   date: string;
   accountId: string;
@@ -36,9 +37,10 @@ export interface Trade {
 
 export const trades: Trade[] = [
   {
+    userId: "dev-user-001",
     id: "LEX-0001",
     date: "2026-09-28",
-    accountId: "prop-5000",
+    accountId: "evaluation-5k",
 
     instrument: "XAUUSD",
     direction: "LONG",

@@ -1,5 +1,5 @@
 import type { Trade } from "./trades";
-import { loadTrades } from "./tradeStore";
+import { getCurrentUserTrades } from "./tradeRepository";
 
 export interface TradeAnalytics {
   trades: Trade[];
@@ -36,7 +36,7 @@ export interface AccountAnalytics extends TradeAnalytics {
  * Get all currently stored trades.
  */
 export function getAllTrades(): Trade[] {
-  return loadTrades();
+  return getCurrentUserTrades();
 }
 
 /**
